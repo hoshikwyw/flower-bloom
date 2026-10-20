@@ -35,12 +35,16 @@ css/style.css       design tokens, layout, iPhone safe areas, animations
 js/flower.js        SVG builder for the Mesua ferrea plant
 js/growth.js        stem / leaf / bud growth timeline (GSAP)
 js/bloom.js         bud → flower bloom timeline (GSAP)
-js/ambient.js       wind, fireflies, pollen, falling petals, tap bursts
+js/ambient.js       wind, fireflies, pollen, petals, heart bokeh, butterflies, tap bursts
 js/message.js       blind box intro + typewriter love message
-js/music.js         music-box melody generated with Web Audio
-js/interact.js      tap to bloom, bud blooming, music button
+js/love.js          heart constellation + blushing moon
+js/finale.js        petals swirl into a giant beating heart
+js/energy.js        "Jie Jie's energy" battery, flying hearts, giggling flowers
+js/music.js         music-box melody + plings/chimes, generated with Web Audio
+js/interact.js      tap handling, bud blooming, music button
 js/main.js          wires everything together
 js/vendor/          GSAP 3.12.5
+assets/og-card.png  link preview card (blind box)
 ```
 
 ## Deploy

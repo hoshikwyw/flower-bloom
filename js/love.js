@@ -23,6 +23,13 @@
 
     /* ---------- Heart constellation ---------- */
 
+    // Rectangles of the visible text (name + typed lines) — petals must avoid these
+    textRects() {
+      return [...document.querySelectorAll(".message__name, .message__shown")]
+        .map((el) => el.getBoundingClientRect())
+        .filter((r) => r.width > 0);
+    },
+
     // Heart box: from just above the name to a bit below the message
     frame() {
       const w = window.innerWidth;
@@ -31,12 +38,28 @@
       if (!name || !page) return null;
       const n = name.getBoundingClientRect();
       const p = page.getBoundingClientRect();
-      const top = n.top - 22;
       const bottom = p.bottom + 64;
+      let top = n.top - 22;
+
+      // Normally a true heart shape; on short landscape screens it widens
+      // just enough to clear the text instead of squashing onto it
+      let width = Math.min(w * 0.85, 540);
+      const shortLandscape = w > window.innerHeight && window.innerHeight < 520;
+      if (shortLandscape) {
+        const textW = Math.max(n.width, ...this.textRects().map((r) => r.width));
+        width = Math.min(width, Math.max((bottom - top) * 1.3, textW + 110));
+      }
+
+      // Stay below the battery / music controls if the heart reaches under them
+      const controls = document.getElementById("controls");
+      if (controls) {
+        const c = controls.getBoundingClientRect();
+        if (w / 2 + width / 2 > c.left) top = Math.max(top, c.bottom + 12);
+      }
       return {
         cx: w / 2,
         cy: (top + bottom) / 2,
-        width: Math.min(w * 0.85, 540),
+        width,
         height: bottom - top,
       };
     },

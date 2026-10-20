@@ -33,14 +33,12 @@
     return Math.exp(-Math.pow(p / 0.055, 2)) + 0.6 * Math.exp(-Math.pow((p - 0.2) / 0.055, 2));
   };
 
-  // Petals must never sit on top of her name
+  // Petals must never sit on top of her name or the message
   function avoidName(points) {
-    const name = document.querySelector(".message__name");
-    if (!name) return points;
-    const r = name.getBoundingClientRect();
-    const pad = 6;
-    return points.filter((p) =>
-      p.x < r.left - pad || p.x > r.right + pad || p.y < r.top - pad || p.y > r.bottom + pad);
+    const rects = window.Love ? window.Love.textRects() : [];
+    const pad = 8;
+    return points.filter((p) => !rects.some((r) =>
+      p.x > r.left - pad && p.x < r.right + pad && p.y > r.top - pad && p.y < r.bottom + pad));
   }
 
   const finale = {

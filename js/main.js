@@ -133,7 +133,9 @@
         const c = document.createElement("div");
         c.className = "cloud";
         // Two bands: small clouds above the name, bigger ones between message and flowers
-        const high = i % 2 === 1;
+        // (Phone in landscape: no room above the name, so all clouds go low)
+        const shortLandscape = state.width > state.height && state.height < 520;
+        const high = i % 2 === 1 && !shortLandscape;
         const w = (high ? rand(0.16, 0.24) : rand(0.26, 0.4)) * Math.min(state.width, 700);
         const dur = rand(70, 130);
         c.style.top = `${high ? rand(0.5, 4) : rand(38, 50)}%`;
