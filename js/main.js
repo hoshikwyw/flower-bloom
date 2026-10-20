@@ -64,13 +64,14 @@
         const bright = Math.random() < 0.08;
         star.className = bright ? "star star--bright" : "star";
 
-        // Keep stars above the hills (top ~72% of the screen)
+        // Stars live in the deeper upper sky; more of them near the top
+        const top = Math.pow(Math.random(), 1.4) * 58;
         star.style.left = `${rand(0, 100)}%`;
-        star.style.top = `${rand(0, 72)}%`;
+        star.style.top = `${top}%`;
         star.style.setProperty("--size", `${bright ? rand(2, 3) : rand(1, 2.2)}px`);
         star.style.setProperty("--dur", `${rand(1.8, 4.5)}s`);
         star.style.setProperty("--delay", `${rand(-4, 0)}s`);
-        star.style.setProperty("--min-o", rand(0.15, 0.5).toFixed(2));
+        star.style.setProperty("--min-o", (rand(0.15, 0.5) * (1 - top / 90)).toFixed(2));
         frag.appendChild(star);
       }
 
@@ -108,9 +109,49 @@
       next();
     },
 
+    /* Part 11 — fluffy pastel clouds: white puffs on a pink underside */
+    cloudSVG() {
+      // A few overlapping puffs; randomised so no two clouds look the same
+      const puffs = [
+        [38, 52, rand(20, 26)],
+        [70, rand(34, 42), rand(26, 32)],
+        [105, rand(38, 46), rand(22, 28)],
+        [132, 54, rand(16, 22)],
+      ];
+      const circles = (dy, fill) =>
+        puffs.map(([cx, cy, r]) => `<circle cx="${cx}" cy="${cy + dy}" r="${r.toFixed(1)}" fill="${fill}"/>`).join("") +
+        `<rect x="30" y="${50 + dy}" width="110" height="${24}" rx="12" fill="${fill}"/>`;
+      return `<svg viewBox="0 0 170 80">${circles(5, "var(--cloud-shade)")}${circles(0, "var(--cloud)")}</svg>`;
+    },
+
+    createClouds() {
+      const el = $("#clouds");
+      if (!el) return;
+      const count = state.width <= 500 ? 4 : 6;
+      const frag = document.createDocumentFragment();
+      for (let i = 0; i < count; i++) {
+        const c = document.createElement("div");
+        c.className = "cloud";
+        // Two bands: small clouds above the name, bigger ones between message and flowers
+        const high = i % 2 === 1;
+        const w = (high ? rand(0.16, 0.24) : rand(0.26, 0.4)) * Math.min(state.width, 700);
+        const dur = rand(70, 130);
+        c.style.top = `${high ? rand(0.5, 4) : rand(38, 50)}%`;
+        c.style.setProperty("--w", `${w.toFixed(0)}px`);
+        c.style.setProperty("--o", rand(0.82, 0.95).toFixed(2));
+        c.style.setProperty("--dur", `${dur.toFixed(0)}s`);
+        c.style.setProperty("--delay", `${(-rand(0, dur)).toFixed(0)}s`); // start mid-journey
+        c.style.setProperty("--bob", `${rand(4, 8).toFixed(1)}s`);
+        c.innerHTML = this.cloudSVG();
+        frag.appendChild(c);
+      }
+      el.replaceChildren(frag);
+    },
+
     init() {
       els.sky.classList.add("sky-enter");
       this.createStars();
+      this.createClouds();
       if (!state.reducedMotion) this.scheduleShootingStars();
 
       // Rebuild stars after rotation / big size changes
@@ -122,6 +163,7 @@
           if (Math.abs(state.width - lastW) > 80) {
             lastW = state.width;
             this.createStars();
+            this.createClouds();
           }
         }, 250);
       }, { passive: true });

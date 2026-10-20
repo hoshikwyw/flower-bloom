@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <!-- viewport-fit=cover lets the scene extend under the iPhone notch / home bar -->
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#0b0a1f" />
+  <meta name="theme-color" content="#2f2560" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <title>For Mama 🌸</title>
@@ -31,7 +31,7 @@
 <body>
   <main id="scene" class="scene" aria-label="A garden of blooming Mesua ferrea flowers">
 
-    <!-- Layer 1: night sky, stars, moon (Part 2) -->
+    <!-- Layer 1: pastel twilight sky, stars, moon, clouds (Parts 2 + 11) -->
     <div id="sky" class="layer layer--sky" aria-hidden="true">
       <div class="sky__glow"></div>
       <div id="stars" class="sky__stars"></div>
@@ -42,18 +42,27 @@
         <div class="moon__body"></div>
       </div>
 
-      <!-- Soft rolling hills; flowers will grow from the front hill -->
+      <!-- Fluffy clouds drift in front of the moon (filled by JS) -->
+      <div id="clouds" class="sky__clouds"></div>
+
+      <!-- Soft pastel hills, far → near; flowers grow from the front hill -->
       <svg class="ground" viewBox="0 0 400 160" preserveAspectRatio="none">
         <defs>
+          <linearGradient id="hillFar" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#f3a6c8" />
+            <stop offset="100%" stop-color="#c98bc0" />
+          </linearGradient>
           <linearGradient id="hillBack" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#2a2150" />
-            <stop offset="100%" stop-color="#171230" />
+            <stop offset="0%" stop-color="#a985cf" />
+            <stop offset="100%" stop-color="#7c62ad" />
           </linearGradient>
           <linearGradient id="hillFront" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#1a1532" />
-            <stop offset="100%" stop-color="#0d0a1c" />
+            <stop offset="0%" stop-color="#5d4a96" />
+            <stop offset="100%" stop-color="#3a2d6b" />
           </linearGradient>
         </defs>
+        <path class="ground__far" fill="url(#hillFar)" opacity="0.85"
+          d="M0 52 C 50 30, 110 34, 160 46 S 290 18, 400 42 L 400 160 L 0 160 Z" />
         <path class="ground__back" fill="url(#hillBack)"
           d="M0 70 C 60 40, 120 45, 180 62 S 300 30, 400 55 L 400 160 L 0 160 Z" />
         <path class="ground__front" fill="url(#hillFront)"

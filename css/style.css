@@ -5,12 +5,17 @@
 
 /* ---------- Design tokens ---------- */
 :root {
-  /* Night sky */
-  --sky-top: #0b0a1f;
-  --sky-mid: #1c1640;
-  --sky-low: #3a2558;
-  --moon-glow: rgba(255, 236, 190, 0.35);
+  /* Pastel twilight sky — deeper lavender up top keeps white text readable,
+     pink & peach only near the horizon */
+  --sky-top: #2f2560;
+  --sky-upper: #4b3b8a;
+  --sky-mid: #7d63b8;
+  --sky-pink: #e59ac4;
+  --sky-low: #ffc9b5;
+  --moon-glow: rgba(255, 214, 230, 0.45);
   --star: #fff8e7;
+  --cloud: #fff2f8;
+  --cloud-shade: #f2a9cc;
 
   /* Mesua ferrea flower */
   --petal: #fffdf7;
@@ -117,19 +122,55 @@ body {
   background: linear-gradient(
     to bottom,
     var(--sky-top) 0%,
-    var(--sky-mid) 55%,
-    var(--sky-low) 100%
+    var(--sky-upper) 28%,
+    var(--sky-mid) 52%,
+    var(--sky-pink) 74%,
+    var(--sky-low) 92%
   );
 }
 
-/* Warm pink-gold glow rising from the horizon, slowly breathing */
+/* Warm pink-peach glow rising from the horizon, slowly breathing */
 .sky__glow {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(120% 45% at 50% 100%, rgba(255, 143, 177, 0.28), transparent 70%),
-    radial-gradient(80% 30% at 20% 95%, rgba(247, 197, 49, 0.12), transparent 70%);
+    radial-gradient(120% 40% at 50% 85%, rgba(255, 170, 200, 0.45), transparent 70%),
+    radial-gradient(70% 28% at 18% 80%, rgba(255, 214, 150, 0.35), transparent 70%),
+    radial-gradient(60% 25% at 85% 78%, rgba(255, 190, 220, 0.3), transparent 70%);
   animation: glow-breathe 9s ease-in-out infinite alternate;
+}
+
+/* ---------- Clouds (Part 11) ---------- */
+.sky__clouds {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* Each cloud drifts across the whole sky, forever; --dur/--delay set in JS */
+.cloud {
+  position: absolute;
+  left: 0;
+  width: var(--w, 140px);
+  opacity: var(--o, 0.7);
+  filter: drop-shadow(0 0 10px rgba(255, 200, 225, 0.45));
+  animation: cloud-drift var(--dur, 90s) linear var(--delay, 0s) infinite;
+  will-change: transform;
+}
+.cloud svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+  animation: cloud-bob var(--bob, 6s) ease-in-out infinite alternate;
+}
+@keyframes cloud-drift {
+  from { transform: translateX(calc(-1 * var(--w, 140px) - 10px)); }
+  to   { transform: translateX(calc(100vw + 10px)); }
+}
+@keyframes cloud-bob {
+  from { transform: translateY(-4px) scaleX(1); }
+  to   { transform: translateY(4px) scaleX(1.03); }
 }
 
 @keyframes glow-breathe {
@@ -210,9 +251,9 @@ body {
   inset: 0;
   border-radius: 50%;
   background:
-    radial-gradient(circle at 35% 35%, #fffaf0 0%, #fbeccb 55%, #e9d3a6 100%);
+    radial-gradient(circle at 35% 35%, #fffdf6 0%, #fff0d9 55%, #f6d2c6 100%);
   box-shadow:
-    inset -6px -4px 12px rgba(180, 150, 100, 0.35),
+    inset -6px -4px 12px rgba(214, 140, 160, 0.35),
     0 0 24px 6px var(--moon-glow);
 }
 
@@ -260,7 +301,7 @@ body {
   display: grid;
   place-items: center;
   padding: calc(var(--safe-top) + var(--gutter)) var(--gutter) calc(var(--safe-bottom) + var(--gutter));
-  background: radial-gradient(circle at 50% 45%, rgba(58, 37, 88, 0.35), rgba(8, 6, 24, 0.72) 70%);
+  background: radial-gradient(circle at 50% 45%, rgba(125, 99, 184, 0.25), rgba(35, 26, 74, 0.7) 70%);
   -webkit-backdrop-filter: blur(3px);
   backdrop-filter: blur(3px);
   opacity: 0;
