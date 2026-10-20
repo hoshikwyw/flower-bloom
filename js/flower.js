@@ -176,26 +176,31 @@
     return root;
   }
 
-  // Long, narrow lanceolate leaf drawn from base (0,0) along +x
-  function createLeaf(parent, { length, width, young, x, y, angle }) {
+  // Long, narrow lanceolate leaf drawn from base (0,0) along +x.
+  // Every leaf has a pink "young" layer on top: mature leaves fade it out
+  // as they grow (Part 4), the top pair keeps it.
+  function createLeaf(parent, { length, width, young, x, y, angle, side, t }) {
     const g = el("g", {
       class: young ? "leaf leaf--young" : "leaf",
       transform: `translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${angle.toFixed(1)})`,
     }, parent);
+    // Inner group is what animates (scale/rotate around the leaf base)
+    const blade = el("g", { class: "leaf__blade" }, g);
     const L = length, W = width;
-    el("path", {
-      d: `M0 0 C ${L * 0.25} ${-W}, ${L * 0.7} ${-W * 0.9}, ${L} 0 ` +
-         `C ${L * 0.7} ${W * 0.9}, ${L * 0.25} ${W}, 0 0 Z`,
-      fill: young ? "url(#gLeafYoung)" : "url(#gLeaf)",
-    }, g);
+    const d =
+      `M0 0 C ${L * 0.25} ${-W}, ${L * 0.7} ${-W * 0.9}, ${L} 0 ` +
+      `C ${L * 0.7} ${W * 0.9}, ${L * 0.25} ${W}, 0 0 Z`;
+    el("path", { d, fill: "url(#gLeaf)" }, blade);
+    const tint = el("path", { class: "leaf__tint", d, fill: "url(#gLeafYoung)" }, blade);
+    if (!young) tint.setAttribute("opacity", 0);
     el("path", {
       d: `M0 0 Q ${L * 0.5} ${-W * 0.12} ${L * 0.96} 0`,
       fill: "none",
       stroke: young ? "#ffc2cf" : "#8cc79a",
       "stroke-width": 0.6,
       opacity: 0.6,
-    }, g);
-    return g;
+    }, blade);
+    return { el: g, blade, tint, young, side, t };
   }
 
   /* ---------- Cubic Bézier helpers (for placing leaves on the stem) ---------- */
@@ -268,6 +273,8 @@
           length: 46 * scale * size,
           width: 8 * scale * size,
           young,
+          side,
+          t,
         }));
       });
     });
@@ -280,13 +287,15 @@
                  `rotate(${rand(-12, 12).toFixed(1)}) scale(${headScale.toFixed(3)})`,
     }, root);
 
-    const bud = createBud(head);
-    const flower = kind === "flower" ? createFlower(head) : null;
+    // Inner group scales around the stem tip (0,0) when the bud pops out
+    const headInner = el("g", { class: "plant__head-inner" }, head);
+    const bud = createBud(headInner);
+    const flower = kind === "flower" ? createFlower(headInner) : null;
 
-    // Part 3 shows the finished bloom; Part 5 animates bud → flower
-    if (flower) bud.setAttribute("opacity", 0);
+    // Plants start as buds; Part 5 animates bud → flower
+    if (flower) flower.root.setAttribute("opacity", 0);
 
-    return { root, stem, leaves, head, bud, flower, kind, depth, scale, height };
+    return { root, stem, leaves, head, headInner, bud, flower, kind, depth, scale, height, x };
   }
 
   window.MesuaFlower = { NS, el, addDefs, createPlant, createFlower, createBud };

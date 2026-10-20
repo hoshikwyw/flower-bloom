@@ -133,6 +133,8 @@
   const garden = {
     svg: null,
     plants: [],
+    growth: null,     // GSAP timeline from Part 4
+    hasGrown: false,  // once grown, rebuilds (rotation) skip straight to the end
 
     // Same height as the .ground SVG in CSS (26%, min 150px)
     groundHeight() {
@@ -207,6 +209,26 @@
 
       els.garden.replaceChildren(svg);
       this.svg = svg;
+
+      // Part 4: set up the growth timeline (needs the SVG in the DOM to measure stems)
+      if (window.gsap && window.Growth) {
+        if (this.growth) this.growth.kill();
+        this.growth = window.Growth.growGarden(this.plants, state);
+        if (this.hasGrown || state.reducedMotion) this.growth.progress(1);
+      }
+    },
+
+    // Plays the growth; resolves when every plant has its bud
+    grow() {
+      return new Promise((resolve) => {
+        if (!this.growth || this.hasGrown || this.growth.progress() === 1) {
+          this.hasGrown = true;
+          return resolve();
+        }
+        this.hasGrown = true;
+        this.growth.eventCallback("onComplete", resolve);
+        this.growth.play();
+      });
     },
 
     init() {
@@ -233,6 +255,9 @@
     onResize();
     sky.init();
     garden.init();
+
+    // Temporary auto-start; Part 7's "tap to open" intro will trigger this instead
+    setTimeout(() => garden.grow(), 1200);
   }
 
   document.addEventListener("DOMContentLoaded", init);
