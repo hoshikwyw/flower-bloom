@@ -283,11 +283,25 @@
 
     // Part 7: the envelope starts everything
     //   tap → envelope opens → plants grow → name + message appear while flowers bloom
+    // Part 8: taps, nudges, music button
+    const interact = window.Interact;
+    const music = window.Music;
+    music.init();
+    interact.init({ scene: els.scene, controls: els.controls, hint: $("#tap-hint"), garden, state });
+
     window.Message.build(els.message, state.reducedMotion);
     window.Intro.init(els.intro, {
+      // Same tap that opens the envelope starts the music (iOS needs a real tap)
+      onTap: () => {
+        music.play();
+        interact.setMusicUI(music.enabled);
+        interact.showControls(els.controls);
+      },
       onOpened: async () => {
+        interact.enable();
+        els.scene.classList.add("is-interactive");
         await garden.play("growth");
-        window.Message.play();
+        window.Message.play().then(() => setTimeout(() => interact.showHint(), 1500));
         await garden.play("bloom");
         if (motion) ambient.startParticles();
       },

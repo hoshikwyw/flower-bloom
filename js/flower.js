@@ -132,7 +132,7 @@
     return { group, stamens };
   }
 
-  function createFlower(parent) {
+  function createFlower(parent, { stamens: stamenCount = 130 } = {}) {
     const root = el("g", { class: "flower" }, parent);
 
     const glow = el("circle", { class: "flower__glow", r: 100, fill: "url(#gFlowerGlow)" }, root);
@@ -155,7 +155,7 @@
     );
 
     const stamenGlow = el("circle", { class: "flower__stamen-glow", r: 42, fill: "url(#gStamenGlow)" }, root);
-    const { group: stamenGroup, stamens } = createStamens(root);
+    const { group: stamenGroup, stamens } = createStamens(root, stamenCount);
 
     // Pistil in the middle
     const pistil = el("g", { class: "flower__pistil" }, root);

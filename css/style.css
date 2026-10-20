@@ -512,7 +512,7 @@ body {
   to   { opacity: 1; }
 }
 
-/* ---------- Controls ---------- */
+/* ---------- Controls (Part 8) ---------- */
 .controls {
   position: absolute;
   z-index: 20;
@@ -520,6 +520,99 @@ body {
   right: calc(var(--safe-right) + var(--gutter));
   display: flex;
   gap: 8px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.8s ease 1s;
+}
+.controls.is-visible { opacity: 1; pointer-events: auto; }
+
+.scene.is-interactive { cursor: pointer; }
+
+/* Round glass music button — 44px = Apple's minimum touch size */
+.music-btn {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 246, 236, 0.25);
+  background: rgba(255, 255, 255, 0.1);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  color: var(--text);
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.3s ease;
+}
+.music-btn:active { transform: scale(0.9); }
+.music-btn:focus-visible { outline: 2px solid var(--love); outline-offset: 3px; }
+.music-btn.is-on { background: rgba(255, 143, 177, 0.22); }
+
+.music-btn svg { width: 20px; height: 20px; overflow: visible; }
+.music-btn__note { fill: currentColor; }
+.music-btn__slash {
+  fill: none;
+  stroke: var(--love);
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  transition: opacity 0.3s ease;
+}
+.music-btn.is-on .music-btn__slash { opacity: 0; }
+
+/* Tiny dancing bars while music plays */
+.music-btn__waves {
+  position: absolute;
+  bottom: 7px;
+  right: 7px;
+  display: flex;
+  gap: 1.5px;
+  align-items: flex-end;
+  height: 8px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.music-btn.is-on .music-btn__waves { opacity: 1; }
+.music-btn__waves i {
+  width: 2px;
+  height: 100%;
+  border-radius: 1px;
+  background: var(--stamen);
+  transform-origin: bottom;
+  animation: eq 0.9s ease-in-out infinite alternate;
+}
+.music-btn__waves i:nth-child(2) { animation-delay: -0.3s; }
+.music-btn__waves i:nth-child(3) { animation-delay: -0.6s; }
+@keyframes eq {
+  from { transform: scaleY(0.25); }
+  to   { transform: scaleY(1); }
+}
+
+/* "Tap to bloom" hint above the home indicator */
+.tap-hint {
+  position: absolute;
+  z-index: 6;
+  left: 50%;
+  bottom: calc(var(--safe-bottom) + 18px);
+  translate: -50% 0;
+  width: max-content;
+  max-width: calc(100% - 2 * var(--gutter));
+  padding: 6px 16px;
+  border-radius: 999px;
+  background: rgba(11, 10, 31, 0.45);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  font-size: var(--fs-sm);
+  color: var(--text-soft);
+  text-align: center;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+.tap-hint.is-visible {
+  opacity: 1;
+  transform: none;
+  animation: hint-pulse 2.2s ease-in-out 1s infinite;
 }
 
 /* ---------- Utilities ---------- */

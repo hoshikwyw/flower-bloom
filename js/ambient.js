@@ -19,6 +19,12 @@
     "C 8 -65, 19 -71, 28 -60 C 43 -38, 24 -10, 0 -6 Z"
   );
 
+  // Small heart for tap bursts (≈ 20 units wide, centred)
+  const HEART = new Path2D(
+    "M0 6 C -2 3, -10 -1, -10 -6 C -10 -10, -6 -12, -3 -11 C -1.5 -10.5, -0.5 -9.5, 0 -8 " +
+    "C 0.5 -9.5, 1.5 -10.5, 3 -11 C 6 -12, 10 -10, 10 -6 C 10 -1, 2 3, 0 6 Z"
+  );
+
   // Pre-rendered soft glow sprite (much cheaper than shadowBlur per frame)
   function makeGlowSprite(size, inner, outer) {
     const c = document.createElement("canvas");
@@ -52,6 +58,8 @@
     fireflies: [],
     pollen: [],
     petals: [],
+    bursts: [],           // hearts + sparkles from taps (Part 8)
+    pointer: null,        // last pointer position, for pushing plants (Part 8)
     sprite: null,
 
     init(canvas, plants) {
@@ -70,6 +78,7 @@
       this.plants = plants;
       plants.forEach((p) => {
         p.swayPhase = rand(0, TAU);
+        p.push = 0;
         p.leaves.forEach((l) => (l.phase = rand(0, TAU)));
       });
     },
@@ -103,10 +112,35 @@
       next();
     },
 
-    updatePlants(t, wind) {
+    /* ---------- Touch / hover push ---------- */
+
+    // Called on pointermove: flowers near the finger/mouse get nudged
+    // in the direction it moves, then spring back.
+    nudge(x, y) {
+      const prev = this.pointer;
+      this.pointer = { x, y };
+      if (!prev) return;
+      const dx = x - prev.x;
+      if (Math.abs(dx) < 0.5) return;
+      for (const p of this.plants) {
+        const r = p.head.getBoundingClientRect();
+        const cx = r.left + r.width / 2;
+        const cy = r.top + r.height / 2;
+        const reach = Math.max(70, r.width);
+        const dist = Math.hypot(x - cx, y - cy);
+        if (dist < reach) {
+          const k = 1 - dist / reach;
+          p.push = Math.max(-9, Math.min(9, p.push + dx * 0.12 * k));
+        }
+      }
+    },
+
+    updatePlants(t, wind, dt) {
+      const decay = Math.pow(0.04, dt); // push fades to ~4% in a second
       for (const p of this.plants) {
         const depth = p.depth === "back" ? 0.7 : 1;
-        const angle = (wind * 1.6 + Math.sin(t * 1.3 + p.swayPhase) * 0.7) * depth;
+        p.push *= decay;
+        const angle = (wind * 1.6 + Math.sin(t * 1.3 + p.swayPhase) * 0.7) * depth + p.push;
         p.sway.setAttribute("transform", `rotate(${angle.toFixed(2)})`);
 
         if (this.leavesReady) {
@@ -180,6 +214,62 @@
       p.baseX = p.x;
     },
 
+    // Little explosion of hearts + golden sparkles at a tap
+    burst(x, y) {
+      const n = this.small ? 10 : 14;
+      for (let i = 0; i < n; i++) {
+        const a = rand(0, TAU);
+        const speed = rand(40, 120);
+        this.bursts.push({
+          x, y,
+          vx: Math.cos(a) * speed,
+          vy: Math.sin(a) * speed - 40,
+          life: 0,
+          maxLife: rand(0.9, 1.6),
+          heart: i % 3 === 0,
+          size: rand(0.5, 0.9),
+          rot: rand(-0.4, 0.4),
+        });
+      }
+    },
+
+    updateBursts(dt) {
+      for (const b of this.bursts) {
+        b.life += dt;
+        b.vx *= Math.pow(0.15, dt);
+        b.vy = b.vy * Math.pow(0.15, dt) - 30 * dt; // hearts float upward
+        b.x += b.vx * dt;
+        b.y += b.vy * dt;
+      }
+      this.bursts = this.bursts.filter((b) => b.life < b.maxLife);
+    },
+
+    drawBursts() {
+      const ctx = this.ctx;
+      for (const b of this.bursts) {
+        const k = b.life / b.maxLife;
+        const alpha = 1 - k * k;
+        if (b.heart) {
+          ctx.globalCompositeOperation = "source-over";
+          ctx.save();
+          ctx.translate(b.x, b.y);
+          ctx.rotate(b.rot);
+          ctx.scale(b.size, b.size);
+          ctx.globalAlpha = alpha;
+          ctx.fillStyle = "#ff8fb1";
+          ctx.fill(HEART);
+          ctx.restore();
+        } else {
+          ctx.globalCompositeOperation = "lighter";
+          ctx.globalAlpha = alpha;
+          const s = 18 * (1 - k * 0.5);
+          ctx.drawImage(this.sprite, b.x - s / 2, b.y - s / 2, s, s);
+        }
+      }
+      ctx.globalCompositeOperation = "source-over";
+      ctx.globalAlpha = 1;
+    },
+
     updateParticles(dt, t, wind) {
       const maxFireflies = this.small ? 14 : 26;
       const maxPollen = this.small ? 26 : 45;
@@ -223,7 +313,8 @@
     draw(t) {
       const ctx = this.ctx;
       ctx.clearRect(0, 0, this.w, this.h);
-      if (this.fade <= 0) return;
+      this.drawBursts();
+      if (!this.particlesOn || this.fade <= 0) return;
 
       // Fireflies + pollen glow additively
       ctx.globalCompositeOperation = "lighter";
@@ -265,12 +356,12 @@
 
       const t = this.time;
       const wind = this.windAt(t);
-      this.updatePlants(t, wind);
+      this.updatePlants(t, wind, dt);
 
-      if (this.particlesOn) {
-        this.updateParticles(dt, t, wind);
-        this.draw(t);
-      }
+      if (this.particlesOn) this.updateParticles(dt, t, wind);
+      this.updateBursts(dt);
+      if (this.particlesOn || this.bursts.length || this.hadBursts) this.draw(t);
+      this.hadBursts = this.bursts.length > 0; // one extra frame clears the last burst
 
       requestAnimationFrame((n) => this.loop(n));
     },
