@@ -39,6 +39,33 @@
     return c;
   }
 
+  // Pre-rendered glowing heart (Part 13): heart fireflies + soft heart bokeh
+  function makeHeartSprite(size, fill, glow, blur) {
+    const c = document.createElement("canvas");
+    c.width = c.height = size;
+    const g = c.getContext("2d");
+    const k = (size * 0.55) / 20; // HEART is ~20 units wide
+    g.translate(size / 2, size / 2 + 3 * k);
+    g.scale(k, k);
+    g.shadowColor = glow;
+    g.shadowBlur = blur;
+    g.fillStyle = fill;
+    g.fill(HEART);
+    g.fill(HEART); // second pass = stronger glow
+    return c;
+  }
+
+  /* ---------- Butterflies (Part 13) ---------- */
+  const BUTTERFLY_COLORS = [
+    ["#ffb3d1", "#ff7fae"],
+    ["#dcc2ff", "#a77bf0"],
+    ["#ffd9a8", "#ffaa6b"],
+  ];
+
+  // Wing shapes in "butterfly units" (body along y, right side; mirrored for left)
+  const WING_UP = new Path2D("M0 -1 C 3 -13, 15 -15, 14 -5 C 13.5 -1, 7 1, 0 0 Z");
+  const WING_LOW = new Path2D("M0 1 C 4 2, 11 4, 9 10 C 7 14, 2 9, 0 2 Z");
+
   const ambient = {
     plants: [],
     canvas: null,
@@ -60,12 +87,16 @@
     petals: [],
     bursts: [],           // hearts + sparkles from taps (Part 8)
     pointer: null,        // last pointer position, for pushing plants (Part 8)
+    bokeh: [],            // big soft hearts rising slowly (Part 13)
+    butterflies: [],      // (Part 13)
     sprite: null,
 
     init(canvas, plants) {
       this.canvas = canvas;
       this.ctx = canvas.getContext("2d");
       this.sprite = makeGlowSprite(64, "rgba(255, 250, 210, 1)", "rgba(255, 226, 122, 0.45)");
+      this.heartSprite = makeHeartSprite(64, "#ffe0ec", "rgba(255, 120, 170, 1)", 14);
+      this.bokehSprite = makeHeartSprite(96, "rgba(255, 196, 220, 0.55)", "rgba(255, 170, 205, 0.9)", 22);
       this.setPlants(plants);
       this.resize();
       window.addEventListener("resize", () => this.resize(), { passive: true });
@@ -190,7 +221,164 @@
         size: rand(16, 28),
         phase: rand(0, TAU),
         blink: rand(0.8, 1.6),
+        heart: Math.random() < 0.35,   // some fireflies glow as tiny hearts 💗
       };
+    },
+
+    /* ---------- Heart bokeh ---------- */
+    spawnBokeh(initial) {
+      this.bokeh.push({
+        x: rand(0, this.w),
+        y: initial ? rand(this.h * 0.2, this.h) : this.h + 40,
+        vy: rand(-16, -7),
+        size: rand(18, 42) * (this.small ? 1 : 1.3),
+        alpha: rand(0.25, 0.5),
+        phase: rand(0, TAU),
+        sway: rand(10, 26),
+        baseX: 0,
+      });
+      const b = this.bokeh[this.bokeh.length - 1];
+      b.baseX = b.x;
+    },
+
+    /* ---------- Butterflies ---------- */
+    makeButterfly(i) {
+      const [wing, edge] = BUTTERFLY_COLORS[i % BUTTERFLY_COLORS.length];
+      return {
+        x: rand(0.1, 0.9) * this.w,
+        y: rand(0.45, 0.7) * this.h,
+        vx: 0,
+        vy: 0,
+        target: null,
+        state: "fly",           // "fly" | "land"
+        timer: rand(2, 4),
+        landOn: null,           // flower index while landed
+        size: rand(1.05, 1.3) * (this.small ? 1 : 1.25),
+        phase: rand(0, TAU),
+        wing,
+        edge,
+      };
+    },
+
+    pickTarget(b) {
+      const centers = this.flowerCenters();
+      // ~45% chance to go land on a flower, otherwise wander the lower sky
+      if (centers.length && Math.random() < 0.45) {
+        b.landOn = (Math.random() * centers.length) | 0;
+        b.target = null;
+      } else {
+        b.landOn = null;
+        b.target = { x: rand(0.08, 0.92) * this.w, y: rand(0.38, 0.8) * this.h };
+      }
+      b.timer = rand(3, 6);
+    },
+
+    updateButterflies(dt, t) {
+      const centers = this.flowerCenters();
+      for (const b of this.butterflies) {
+        b.timer -= dt;
+
+        // Where are we heading? A flower (sitting just on its petals) or a wander point
+        let tx, ty;
+        if (b.landOn !== null && centers[b.landOn]) {
+          const c = centers[b.landOn];
+          tx = c.x + c.r * 0.6;
+          ty = c.y - c.r * 1.2;
+        } else if (b.target) {
+          tx = b.target.x;
+          ty = b.target.y;
+        } else {
+          this.pickTarget(b);
+          continue;
+        }
+
+        const dx = tx - b.x;
+        const dy = ty - b.y;
+        const dist = Math.hypot(dx, dy);
+
+        if (b.state === "land") {
+          // Ride along with the swaying flower
+          b.x += dx * Math.min(1, dt * 8);
+          b.y += dy * Math.min(1, dt * 8);
+          if (b.timer <= 0) {
+            // Take off upward and wander a bit before choosing another flower
+            b.state = "fly";
+            b.vy = -60;
+            b.landOn = null;
+            b.target = { x: rand(0.08, 0.92) * this.w, y: rand(0.38, 0.65) * this.h };
+            b.timer = rand(2, 4);
+          }
+          continue;
+        }
+
+        // Flying: ease toward the target, with a fluttery bob
+        const speed = 55;
+        const desiredX = dist > 1 ? (dx / dist) * speed : 0;
+        const desiredY = dist > 1 ? (dy / dist) * speed : 0;
+        const k = Math.min(1, dt * 2.2);
+        b.vx += (desiredX - b.vx) * k;
+        b.vy += (desiredY - b.vy) * k;
+        b.x += b.vx * dt;
+        b.y += b.vy * dt + Math.sin(t * 6 + b.phase) * 0.6;
+
+        if (b.landOn !== null && dist < 6) {
+          b.state = "land";
+          b.timer = rand(3, 6);
+          b.vx = b.vy = 0;
+        } else if (b.landOn === null && (dist < 12 || b.timer <= 0)) {
+          this.pickTarget(b);
+        }
+      }
+    },
+
+    drawButterfly(b, t) {
+      const ctx = this.ctx;
+      const landed = b.state === "land";
+      // Wings flap fast in flight, slow open/close when resting on a flower
+      const flap = landed
+        ? 0.35 + 0.65 * Math.abs(Math.sin(t * 2.2 + b.phase))
+        : 0.2 + 0.8 * Math.abs(Math.sin(t * 15 + b.phase));
+      const tilt = landed ? -0.15 : Math.max(-0.5, Math.min(0.5, b.vx * 0.008));
+
+      ctx.save();
+      ctx.translate(b.x, b.y);
+      ctx.rotate(tilt);
+      ctx.scale(b.size, b.size);
+      ctx.globalAlpha = this.fade;
+
+      for (const side of [-1, 1]) {
+        ctx.save();
+        ctx.scale(side * flap, 1);
+        ctx.fillStyle = b.wing;
+        ctx.strokeStyle = b.edge;
+        ctx.lineWidth = 1.2;
+        ctx.fill(WING_UP);
+        ctx.stroke(WING_UP);
+        ctx.fill(WING_LOW);
+        ctx.stroke(WING_LOW);
+        // White polka dots
+        ctx.fillStyle = "rgba(255,255,255,0.85)";
+        ctx.beginPath();
+        ctx.arc(9, -7, 1.8, 0, TAU);
+        ctx.arc(5, 5, 1.3, 0, TAU);
+        ctx.fill();
+        ctx.restore();
+      }
+
+      // Body + antennae
+      ctx.fillStyle = "#5b3a6e";
+      ctx.beginPath();
+      ctx.ellipse(0, 1, 1.5, 6.5, 0, 0, TAU);
+      ctx.fill();
+      ctx.strokeStyle = "#5b3a6e";
+      ctx.lineWidth = 0.9;
+      ctx.beginPath();
+      ctx.moveTo(-0.5, -5);
+      ctx.quadraticCurveTo(-3, -10, -4.5, -11);
+      ctx.moveTo(0.5, -5);
+      ctx.quadraticCurveTo(3, -10, 4.5, -11);
+      ctx.stroke();
+      ctx.restore();
     },
 
     spawnPollen() {
@@ -320,6 +508,24 @@
         p.flip += dt * 2.2;
       }
       this.petals = this.petals.filter((p) => p.y < this.h + 30);
+
+      // Soft heart bokeh rises slowly from the bottom
+      const maxBokeh = this.small ? 6 : 10;
+      if (!this.bokeh.length) for (let i = 0; i < maxBokeh; i++) this.spawnBokeh(true);
+      else if (this.bokeh.length < maxBokeh && Math.random() < dt * 0.5) this.spawnBokeh(false);
+      for (const b of this.bokeh) {
+        b.y += b.vy * dt;
+        b.baseX += wind * 8 * dt;
+        b.x = b.baseX + Math.sin(t * 0.5 + b.phase) * b.sway;
+      }
+      this.bokeh = this.bokeh.filter((b) => b.y > -60);
+
+      // Butterflies
+      const maxButterflies = this.small ? 2 : 3;
+      while (this.butterflies.length < maxButterflies) {
+        this.butterflies.push(this.makeButterfly(this.butterflies.length));
+      }
+      this.updateButterflies(dt, t);
     },
 
     draw(t) {
@@ -328,12 +534,24 @@
       this.drawBursts();
       if (!this.particlesOn || this.fade <= 0) return;
 
-      // Fireflies + pollen glow additively
+      // Big soft hearts drifting in the back, gently pulsing
+      for (const b of this.bokeh) {
+        const fadeEdge = Math.min(1, (this.h + 40 - b.y) / 120, (b.y + 60) / 160);
+        ctx.globalAlpha = b.alpha * (0.75 + 0.25 * Math.sin(t * 1.2 + b.phase)) * fadeEdge * this.fade;
+        ctx.drawImage(this.bokehSprite, b.x - b.size / 2, b.y - b.size / 2, b.size, b.size);
+      }
+
+      // Fireflies + pollen glow additively (some fireflies are little hearts)
       ctx.globalCompositeOperation = "lighter";
       for (const f of this.fireflies) {
         const pulse = 0.35 + 0.65 * Math.max(0, Math.sin(t * f.blink + f.phase));
         ctx.globalAlpha = pulse * this.fade;
-        ctx.drawImage(this.sprite, f.x - f.size / 2, f.y - f.size / 2, f.size, f.size);
+        if (f.heart) {
+          const s = f.size * 0.85;
+          ctx.drawImage(this.heartSprite, f.x - s / 2, f.y - s / 2, s, s);
+        } else {
+          ctx.drawImage(this.sprite, f.x - f.size / 2, f.y - f.size / 2, f.size, f.size);
+        }
       }
 
       ctx.fillStyle = "#ffd75a";
@@ -357,6 +575,8 @@
         ctx.fill(PETAL);
         ctx.restore();
       }
+
+      for (const b of this.butterflies) this.drawButterfly(b, t);
       ctx.globalAlpha = 1;
     },
 

@@ -363,8 +363,11 @@
         window.Message.play().then(() => setTimeout(() => interact.showHint(), 1500));
         await garden.play("bloom");
         if (motion) ambient.startParticles();
+        // Part 13: stars connect into a heart around her name
+        window.Love.draw(state.reducedMotion);
       },
     });
+    window.Love.init();
   }
 
   document.addEventListener("DOMContentLoaded", init);

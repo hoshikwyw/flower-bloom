@@ -40,6 +40,21 @@
       <div class="moon">
         <div class="moon__halo"></div>
         <div class="moon__body"></div>
+        <!-- Sleepy blushing moon face; tap the moon → happy face (Part 13) -->
+        <svg class="moon__face" viewBox="-50 -50 100 100">
+          <ellipse class="moon__cheek" cx="-25" cy="10" rx="9" ry="5.5" />
+          <ellipse class="moon__cheek" cx="25" cy="10" rx="9" ry="5.5" />
+          <g class="moon__sleep">
+            <path d="M-23 -3 Q -16 4 -9 -3" />
+            <path d="M9 -3 Q 16 4 23 -3" />
+            <path d="M-5 13 Q 0 17 5 13" />
+          </g>
+          <g class="moon__happy">
+            <path d="M-23 1 Q -16 -9 -9 1" />
+            <path d="M9 1 Q 16 -9 23 1" />
+            <path d="M-7 11 Q 0 21 7 11 Z" class="moon__mouth" />
+          </g>
+        </svg>
       </div>
 
       <!-- Fluffy clouds drift in front of the moon (filled by JS) -->
@@ -113,6 +128,7 @@
   <script src="js/bloom.js"></script>
   <script src="js/ambient.js"></script>
   <script src="js/message.js"></script>
+  <script src="js/love.js"></script>
   <script src="js/music.js"></script>
   <script src="js/interact.js"></script>
   <script src="js/main.js"></script>

@@ -61,6 +61,12 @@
       if (window.Ambient && window.Ambient.running) window.Ambient.burst(x, y);
       this.hideHint();
 
+      // Tapped the moon? It wakes up and blushes 🌙☺️
+      if (window.Love && window.Love.hitsMoon(x, y)) {
+        window.Love.moonBlush();
+        return;
+      }
+
       // Tapped near a closed bud? Bloom it. Otherwise bloom a new flower here.
       const bud = this.findBud(x, y);
       if (bud) this.bloomBud(bud);
