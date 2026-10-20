@@ -403,7 +403,7 @@ body {
   to   { transform: rotate(5deg); }
 }
 
-/* ---------- Intro envelope (Part 7) ---------- */
+/* ---------- Intro blind box (Part 7) ---------- */
 .layer--intro {
   display: grid;
   place-items: center;
@@ -437,116 +437,263 @@ body {
   border-radius: 16px;
 }
 
-/* Warm glow behind the envelope */
+/* Warm glow behind the box */
 .intro__button::before {
   content: "";
   position: absolute;
   left: 50%;
-  top: 34%;
-  width: 260px;
-  height: 260px;
+  top: 55%;
+  width: 300px;
+  height: 300px;
   translate: -50% -50%;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(255, 143, 177, 0.35), transparent 65%);
+  background: radial-gradient(circle, rgba(255, 143, 177, 0.38), transparent 65%);
   animation: halo-pulse 2.6s ease-in-out infinite alternate;
   pointer-events: none;
 }
 
-.envelope {
+/* Myanmar text (intro title) */
+.my {
+  font-family: "Padauk", "Myanmar Sangam MN", "Myanmar Text", "Noto Sans Myanmar", sans-serif;
+  line-height: 1.6;
+}
+
+/* "ပါဆယ် လာတယ်ဗျို့" — bounces in, then wiggles now and then */
+.intro__title {
+  position: relative;
+  padding: 4px 18px 2px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  color: #d94f7c;
+  font-size: clamp(1.35rem, 6.4vw, 2rem);
+  font-weight: 700;
+  box-shadow: 0 6px 20px rgba(120, 50, 110, 0.35), 0 0 0 4px rgba(255, 179, 207, 0.55);
+  animation: title-in 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s both,
+             title-wiggle 3s ease-in-out 1.5s infinite;
+}
+/* Speech-bubble tail pointing at the box */
+.intro__title::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -9px;
+  width: 18px;
+  height: 18px;
+  translate: -50% 0;
+  rotate: 45deg;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.92);
+  z-index: -1;
+}
+@keyframes title-in {
+  from { opacity: 0; transform: translateY(16px) scale(0.6); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes title-wiggle {
+  0%, 80%, 100% { rotate: 0deg; }
+  85% { rotate: -4deg; }
+  90% { rotate: 4deg; }
+  95% { rotate: -2deg; }
+}
+
+/* ---------- Blind box ---------- */
+.blindbox {
   position: relative;
   display: block;
-  width: 180px;
-  height: 120px;
-  perspective: 700px;
-  animation: float 3.2s ease-in-out infinite;
+  width: 170px;
+  height: 160px;
+  margin-top: 6px;
+  transform-origin: 50% 100%;
+  animation: box-idle 3s ease-in-out infinite;
 }
-.layer--intro.is-opening .envelope { animation-play-state: paused; }
+.blindbox > span { position: absolute; display: block; }
 
-@keyframes float {
-  0%, 100% { transform: translateY(0) rotate(-2deg); }
-  50%      { transform: translateY(-10px) rotate(2deg); }
+/* Floats, then shakes as if something inside is moving */
+@keyframes box-idle {
+  0%, 100% { transform: translateY(0); }
+  35%      { transform: translateY(-8px); }
+  68%      { transform: translateY(0); }
+  72%      { transform: rotate(-5deg); }
+  77%      { transform: rotate(5deg); }
+  82%      { transform: rotate(-4deg); }
+  87%      { transform: rotate(3deg); }
+  92%      { transform: rotate(0); }
 }
+/* While opening, GSAP takes over (CSS animations would override its styles) */
+.layer--intro.is-opening .blindbox,
+.layer--intro.is-opening .blindbox__lid,
+.layer--intro.is-opening .intro__title,
+.layer--intro.is-opening .intro__hint { animation: none; }
 
-.envelope > span { position: absolute; display: block; }
-
-.envelope__back {
-  inset: 0;
-  border-radius: 10px;
-  background: #e595ab;
-  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.35);
-}
-
-.envelope__letter {
-  left: 12px;
-  right: 12px;
-  bottom: 8px;
-  height: 104px;
+.blindbox__body {
+  left: 10px;
+  bottom: 0;
+  width: 150px;
+  height: 108px;
   z-index: 2;
-  border-radius: 6px;
-  background: linear-gradient(#fffdf7, #f6eedb);
-  display: grid !important;
-  place-items: start center;
-  padding-top: 6px;
-}
-.envelope__flower {
-  width: 64px;
-  height: 64px;
-  overflow: visible;
+  border-radius: 8px 8px 18px 18px;
+  background:
+    radial-gradient(circle, rgba(255, 255, 255, 0.6) 2.5px, transparent 3px) 0 0 / 18px 18px,
+    linear-gradient(160deg, #ffc6dc, #ff9cc2);
+  box-shadow:
+    inset 0 -12px 0 rgba(214, 90, 140, 0.16),
+    0 18px 28px rgba(40, 20, 70, 0.4);
 }
 
-.envelope__front {
-  inset: 0;
-  z-index: 3;
-  border-radius: 10px;
-  background: linear-gradient(160deg, #f9cdd8, #f0aabd);
-  clip-path: polygon(0 0, 50% 58%, 100% 0, 100% 100%, 0 100%);
-}
-
-.envelope__flap {
-  left: 0;
-  right: 0;
+.blindbox__ribbon {
+  position: absolute;
   top: 0;
-  height: 62%;
-  z-index: 4;
-  background: linear-gradient(#f4b6c6, #ec9fb4);
-  clip-path: polygon(0 0, 100% 0, 50% 100%);
-  transform-origin: top center;
-  border-radius: 10px 10px 0 0;
-}
-
-.envelope__seal {
+  bottom: 0;
   left: 50%;
-  top: 62%;
-  z-index: 5;
-  width: 34px;
-  height: 34px;
-  margin: -17px 0 0 -17px;
-  display: grid !important;
-  place-items: center;
-  border-radius: 50%;
-  background: radial-gradient(circle at 35% 30%, #f06a8a, #b8304f);
-  color: #fff;
-  font-size: 16px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  width: 22px;
+  translate: -50% 0;
+  background: linear-gradient(90deg, #b996f5, #e6d6ff, #b996f5);
 }
 
-.intro__to {
+/* "?" sticker — the blind box mystery */
+.blindbox__label {
+  position: absolute;
+  left: 50%;
+  top: 50%;
   display: flex;
-  align-items: baseline;
-  gap: 10px;
-  text-shadow: 0 0 18px rgba(255, 143, 177, 0.6);
+  flex-direction: column;
+  align-items: center;
+  width: 84px;
+  padding: 2px 6px 6px;
+  translate: -50% -46%;
+  rotate: -5deg;
+  border-radius: 12px;
+  background: #fffaf3;
+  box-shadow: 0 3px 8px rgba(120, 50, 110, 0.25);
 }
-.intro__name {
+.blindbox__label b {
+  font-size: 34px;
+  line-height: 1.1;
+  color: #8a5cd6;
+}
+.blindbox__label small {
   font-family: var(--font-script);
-  font-size: var(--fs-xl);
+  font-size: 15px;
   font-weight: 700;
   line-height: 1;
+  color: #e0578a;
+  white-space: nowrap;
 }
-.intro__for {
-  font-size: var(--fs-lg);
-  font-weight: 500;
-  line-height: 1.4;
-  opacity: 0.9;
+
+.blindbox__lid {
+  left: 2px;
+  bottom: 100px;
+  width: 166px;
+  height: 34px;
+  z-index: 3;
+  border-radius: 10px;
+  background:
+    radial-gradient(circle, rgba(255, 255, 255, 0.6) 2.5px, transparent 3px) 9px 9px / 18px 18px,
+    linear-gradient(#ffb0cd, #f78bb4);
+  box-shadow: 0 5px 0 rgba(214, 90, 140, 0.35);
+  transform-origin: 50% 100%;
+  animation: lid-hop 3s ease-in-out infinite;
+}
+/* The lid jiggles while the box shakes */
+@keyframes lid-hop {
+  0%, 70%, 92%, 100% { transform: none; }
+  75% { transform: translateY(-7px) rotate(-4deg); }
+  82% { transform: translateY(-4px) rotate(3deg); }
+}
+
+/* Bow on top: knot + two loops */
+.blindbox__bow {
+  position: absolute;
+  left: 50%;
+  bottom: 100%;
+  width: 18px;
+  height: 16px;
+  translate: -50% 5px;
+  border-radius: 6px;
+  background: #a77bf0;
+  z-index: 1;
+}
+.blindbox__bow::before,
+.blindbox__bow::after {
+  content: "";
+  position: absolute;
+  bottom: 2px;
+  width: 34px;
+  height: 24px;
+  border: 7px solid #b996f5;
+  border-radius: 50%;
+  z-index: -1;
+}
+.blindbox__bow::before { right: 8px;  rotate: 25deg; }
+.blindbox__bow::after  { left: 8px;   rotate: -25deg; }
+
+/* Light rays bursting out when it opens */
+.blindbox__rays {
+  left: 50%;
+  top: 30px;
+  width: 300px;
+  height: 300px;
+  margin: -150px 0 0 -150px;
+  z-index: 0;
+  border-radius: 50%;
+  background: repeating-conic-gradient(rgba(255, 240, 200, 0.55) 0deg 10deg, transparent 10deg 24deg);
+  -webkit-mask: radial-gradient(circle, #000 20%, transparent 68%);
+  mask: radial-gradient(circle, #000 20%, transparent 68%);
+  opacity: 0;
+  transform: scale(0);
+}
+.layer--intro.is-opening .blindbox__rays { animation: rays-spin 6s linear infinite; }
+@keyframes rays-spin { to { rotate: 360deg; } }
+
+/* The smiling flower hiding inside */
+.blindbox__surprise {
+  left: 50%;
+  bottom: 50px;
+  width: 104px;
+  height: 104px;
+  margin-left: -52px;
+  z-index: 1;
+  opacity: 0;
+}
+.blindbox__flower {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  filter: drop-shadow(0 0 12px rgba(255, 230, 150, 0.8));
+}
+
+/* Floating "? ♡ ? ✦" around the box */
+.blindbox__marks { inset: 0; pointer-events: none; }
+.blindbox__marks i {
+  position: absolute;
+  font-style: normal;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.85);
+  text-shadow: 0 0 8px rgba(255, 143, 177, 0.9);
+  animation: mark-float 2.8s ease-in-out infinite;
+}
+.blindbox__marks i:nth-child(1) { left: -22px; top: 30px;  font-size: 22px; }
+.blindbox__marks i:nth-child(2) { right: -24px; top: 10px; font-size: 20px; color: #ffb3cf; animation-delay: -0.7s; }
+.blindbox__marks i:nth-child(3) { right: -14px; top: 78px; font-size: 16px; animation-delay: -1.4s; }
+.blindbox__marks i:nth-child(4) { left: -10px; top: 96px;  font-size: 14px; color: #ffe27a; animation-delay: -2.1s; }
+@keyframes mark-float {
+  0%, 100% { transform: translateY(0) rotate(-8deg); opacity: 0.5; }
+  50%      { transform: translateY(-10px) rotate(8deg); opacity: 1; }
+}
+.layer--intro.is-opening .blindbox__marks { opacity: 0; transition: opacity 0.3s ease; }
+
+/* Heart confetti (spans added by JS) */
+.blindbox__confetti {
+  left: 50%;
+  top: 40px;
+  z-index: 4;
+}
+.blindbox__confetti span {
+  position: absolute;
+  left: 0;
+  top: 0;
+  font-size: 18px;
+  pointer-events: none;
 }
 
 .intro__hint {
@@ -665,9 +812,9 @@ body {
   .message__name  { font-size: 12vh; }
   .message__page  { font-size: 4.6vh; margin-top: 1vh; }
   .moon           { top: calc(var(--safe-top) + 6vh); width: 14vh; }
-  .envelope       { scale: 0.8; } /* separate from the float animation's transform */
+  .blindbox       { scale: 0.72; margin: -18px 0; } /* separate from the idle animation's transform */
   .intro__button  { gap: 10px; padding: 8px; }
-  .intro__name    { font-size: 13vh; }
+  .intro__title   { font-size: 7vh; }
   .tap-hint       { bottom: calc(var(--safe-bottom) + 8px); }
 }
 

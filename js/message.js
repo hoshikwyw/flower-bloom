@@ -1,5 +1,5 @@
 /* =========================================================
-   Part 7 — Intro envelope + love message
+   Part 7 — Intro blind box + love message
    ========================================================= */
 
 (() => {
@@ -148,7 +148,9 @@
     },
   };
 
-  /* ---------- Intro envelope ---------- */
+  /* ---------- Intro blind box ---------- */
+  const CONFETTI = ["💗", "♡", "✦", "🌸", "✨", "💖"];
+
   const intro = {
     root: null,
     opened: false,
@@ -157,15 +159,20 @@
      * @param {HTMLElement} root
      * @param {{onTap?: Function, onOpened?: Function}} cb
      *   onTap runs inside the tap itself (iOS only allows audio from a user gesture),
-     *   onOpened runs once the envelope animation has finished.
+     *   onOpened runs once the box-opening animation has finished.
      */
     init(root, { onTap, onOpened } = {}) {
       this.root = root;
       const button = root.querySelector(".intro__button");
 
-      // Little Mesua flower tucked in the letter (reuses the garden's gradients)
-      const svg = root.querySelector(".envelope__flower");
-      if (svg && window.MesuaFlower) window.MesuaFlower.createFlower(svg);
+      // The surprise inside: a Mesua flower, already awake and smiling
+      // (reuses the garden's gradients, so the garden must be built first)
+      const svg = root.querySelector(".blindbox__flower");
+      if (svg && window.MesuaFlower) {
+        const f = window.MesuaFlower.createFlower(svg);
+        f.face.sleep.setAttribute("opacity", 0);
+        f.face.awake.setAttribute("opacity", 1);
+      }
 
       const open = () => {
         if (this.opened) return;
@@ -187,21 +194,64 @@
       }
 
       const q = (s) => r.querySelector(s);
+      const box = q(".blindbox");
+      const lid = q(".blindbox__lid");
       return new Promise((resolve) => {
         gsap.timeline({ onComplete: resolve })
           .to(q(".intro__hint"), { opacity: 0, duration: 0.3 }, 0)
-          .to(q(".envelope__seal"), { scale: 1.4, duration: 0.15, ease: "power1.out" }, 0)
-          .to(q(".envelope__seal"), { scale: 0, opacity: 0, duration: 0.25, ease: "back.in(2)" }, 0.15)
-          .to(q(".envelope__flap"), { rotateX: 180, duration: 0.7, ease: "power2.inOut" }, 0.3)
-          .set(q(".envelope__flap"), { zIndex: 1 }, 0.65)
-          .to(q(".envelope__letter"), { yPercent: -62, duration: 0.8, ease: "back.out(1.6)" }, 0.9)
-          .fromTo(q(".envelope__flower"),
-            { scale: 0.3, rotate: -40 },
-            { scale: 1, rotate: 0, duration: 0.9, ease: "back.out(2)" }, 1.0)
-          .to(q(".intro__button"), { y: -30, scale: 1.08, duration: 0.6, ease: "sine.inOut" }, 2.0)
-          .to(r, { opacity: 0, duration: 0.9, ease: "power2.in" }, 2.2)
+          // 1. Squish… stretch… (she pressed it!)
+          .to(box, { scaleX: 1.12, scaleY: 0.86, duration: 0.16, ease: "power2.out" }, 0)
+          .to(box, { scaleX: 0.94, scaleY: 1.08, duration: 0.16, ease: "sine.inOut" }, 0.16)
+          .to(box, { scaleX: 1, scaleY: 1, duration: 0.18, ease: "sine.out" }, 0.32)
+          // 2. Something inside is going crazy
+          .to(box, {
+            keyframes: [
+              { rotate: -9 }, { rotate: 8 }, { rotate: -8 }, { rotate: 7 },
+              { rotate: -5 }, { rotate: 3 }, { rotate: 0 },
+            ],
+            duration: 0.65,
+            ease: "none",
+          }, 0.45)
+          .to(lid, { y: -6, duration: 0.08, yoyo: true, repeat: 5 }, 0.45)
+          // 3. POP — the lid flies off
+          .to(lid, { y: -190, x: 46, rotate: -38, duration: 0.95, ease: "power2.out" }, 1.15)
+          .to(lid, { opacity: 0, duration: 0.35 }, 1.75)
+          // 4. Light bursts out and the smiling flower jumps up
+          .to(q(".blindbox__rays"), { opacity: 1, scale: 1, duration: 0.6, ease: "back.out(1.7)" }, 1.2)
+          .fromTo(q(".blindbox__surprise"),
+            { y: 40, scale: 0.3, rotate: -30, opacity: 0 },
+            { y: -82, scale: 1.15, rotate: 0, opacity: 1, duration: 0.85, ease: "back.out(2.2)" }, 1.25)
+          .add(() => this.confetti(), 1.3)
+          // Title floats up out of the flower's way
+          .to(q(".intro__title"), { y: -78, scale: 1.08, duration: 0.6, ease: "back.out(1.8)" }, 1.15)
+          // 5. Everything fades into the garden
+          .to(r, { opacity: 0, duration: 0.9, ease: "power2.in" }, 3.0)
           .set(r, { display: "none" });
       });
+    },
+
+    // Hearts & sparkles pop out of the open box
+    confetti() {
+      const holder = this.root.querySelector(".blindbox__confetti");
+      if (!holder) return;
+      for (let i = 0; i < 18; i++) {
+        const s = document.createElement("span");
+        s.textContent = CONFETTI[i % CONFETTI.length];
+        holder.appendChild(s);
+        const a = -Math.PI / 2 + (Math.random() - 0.5) * Math.PI * 1.3; // mostly upward
+        const d = 80 + Math.random() * 110;
+        gsap.fromTo(s,
+          { x: 0, y: 0, xPercent: -50, yPercent: -50, scale: 0.3, opacity: 1, rotate: 0 },
+          {
+            x: Math.cos(a) * d,
+            y: Math.sin(a) * d,
+            scale: 0.8 + Math.random() * 0.6,
+            rotate: (Math.random() - 0.5) * 120,
+            duration: 0.9 + Math.random() * 0.5,
+            ease: "power2.out",
+          });
+        gsap.to(s, { opacity: 0, y: "+=40", duration: 0.6, delay: 0.9 + Math.random() * 0.4, ease: "power1.in" });
+      }
     },
   };
 

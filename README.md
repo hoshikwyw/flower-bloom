@@ -5,7 +5,7 @@ just for her, with a little love message and a music-box melody.
 
 ## The experience
 
-1. A floating envelope: **"for Jie Jie"** → tap to open
+1. A shaking blind box: **"ပါဆယ် လာတယ်ဗျို့"** → tap, the lid pops off and a smiling flower jumps out
 2. Stems grow out of the hills, pink-red young leaves unfurl and turn green
 3. Buds swell, 4 white petals unfold, golden stamens burst like fireworks
 4. Her name appears, then the love message types out line by line
@@ -36,7 +36,7 @@ js/flower.js        SVG builder for the Mesua ferrea plant
 js/growth.js        stem / leaf / bud growth timeline (GSAP)
 js/bloom.js         bud → flower bloom timeline (GSAP)
 js/ambient.js       wind, fireflies, pollen, falling petals, tap bursts
-js/message.js       envelope intro + Myanmar typewriter message
+js/message.js       blind box intro + typewriter love message
 js/music.js         music-box melody generated with Web Audio
 js/interact.js      tap to bloom, bud blooming, music button
 js/main.js          wires everything together

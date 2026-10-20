@@ -340,8 +340,8 @@
       ambient.start();
     }
 
-    // Part 7: the envelope starts everything
-    //   tap → envelope opens → plants grow → name + message appear while flowers bloom
+    // Part 7: the blind box starts everything
+    //   tap → box opens → plants grow → name + message appear while flowers bloom
     // Part 8: taps, nudges, music button
     const interact = window.Interact;
     const music = window.Music;
@@ -351,7 +351,7 @@
 
     window.Message.build(els.message, state.reducedMotion);
     window.Intro.init(els.intro, {
-      // Same tap that opens the envelope starts the music (iOS needs a real tap)
+      // Same tap that opens the box starts the music (iOS needs a real tap)
       onTap: () => {
         music.play();
         interact.setMusicUI(music.enabled);

@@ -10,19 +10,28 @@
   <title>For Jie Jie 🌸</title>
   <meta name="description" content="A little surprise, just for you 💌" />
 
-  <!-- Link preview (Messenger / Viber / Telegram) — keeps the surprise hidden -->
-  <meta property="og:title" content="For Jie Jie 💌" />
-  <meta property="og:description" content="A little surprise, just for you. Tap to open 🌸" />
+  <!-- Link preview (Messenger / Viber / Telegram): shows the blind box card, keeps the surprise hidden.
+       og:image must be an absolute URL. Regenerate assets/og-card.png if the box design changes. -->
+  <meta property="og:title" content="ပါဆယ် လာတယ်ဗျို့ 📦" />
+  <meta property="og:description" content="tap to open 💝" />
   <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://hoshikwyw.github.io/flower-bloom/" />
+  <meta property="og:image" content="https://hoshikwyw.github.io/flower-bloom/assets/og-card.png" />
+  <meta property="og:image:type" content="image/png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="A cute pink blind box for Jie Jie" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="https://hoshikwyw.github.io/flower-bloom/assets/og-card.png" />
 
   <!-- Favicon: a tiny Mesua flower -->
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-50 -50 100 100'%3E%3Cg fill='%23fffdf7' stroke='%23eadfc3' stroke-width='2'%3E%3Cellipse cy='-22' rx='17' ry='22'/%3E%3Cellipse cy='22' rx='17' ry='22'/%3E%3Cellipse cx='-22' rx='22' ry='17'/%3E%3Cellipse cx='22' rx='22' ry='17'/%3E%3C/g%3E%3Ccircle r='13' fill='%23f7c531'/%3E%3C/svg%3E" />
 
-  <!-- Fonts: Quicksand (body + message), Dancing Script (name) — only the weights we use -->
+  <!-- Fonts: Quicksand (body + message), Dancing Script (name), Padauk (Myanmar intro title) -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
-    href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Quicksand:wght@400;500;600&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Padauk:wght@700&family=Quicksand:wght@400;500;600&display=swap"
     rel="stylesheet"
   />
 
@@ -94,23 +103,28 @@
     <!-- Layer 4: love message (Part 7) — filled in by js/message.js -->
     <section id="message" class="layer layer--message"></section>
 
-    <!-- Layer 5: intro "tap to open" envelope (Part 7) -->
+    <!-- Layer 5: intro — a surprise blind box to open -->
     <section id="intro" class="layer layer--intro">
-      <button class="intro__button" type="button" aria-label="Open your surprise">
-        <span class="envelope" aria-hidden="true">
-          <span class="envelope__back"></span>
-          <span class="envelope__letter">
-            <svg class="envelope__flower" viewBox="-80 -80 160 160"></svg>
+      <button class="intro__button" type="button" aria-label="Open your surprise parcel">
+        <span class="intro__title my" lang="my">ပါဆယ် လာတယ်ဗျို့</span>
+        <span class="blindbox" aria-hidden="true">
+          <span class="blindbox__rays"></span>
+          <!-- The surprise inside: a smiling Mesua flower (drawn by JS) -->
+          <span class="blindbox__surprise">
+            <svg class="blindbox__flower" viewBox="-80 -80 160 160"></svg>
           </span>
-          <span class="envelope__front"></span>
-          <span class="envelope__flap"></span>
-          <span class="envelope__seal">♥</span>
+          <span class="blindbox__body">
+            <span class="blindbox__ribbon"></span>
+            <span class="blindbox__label"><b>?</b><small>for Jie Jie</small></span>
+          </span>
+          <span class="blindbox__lid">
+            <span class="blindbox__ribbon"></span>
+            <span class="blindbox__bow"></span>
+          </span>
+          <span class="blindbox__marks"><i>?</i><i>♡</i><i>?</i><i>✦</i></span>
+          <span class="blindbox__confetti"></span>
         </span>
-        <span class="intro__to">
-          <span class="intro__for">for</span>
-          <span class="intro__name">Jie Jie</span>
-        </span>
-        <span class="intro__hint">tap to open 💌</span>
+        <span class="intro__hint">tap to open 💝</span>
       </button>
     </section>
 
