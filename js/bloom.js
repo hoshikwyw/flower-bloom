@@ -36,7 +36,9 @@
     if (f.face) {
       f.face.sleep.setAttribute("opacity", 1);
       f.face.awake.setAttribute("opacity", 0);
+      if (f.face.joy) f.face.joy.setAttribute("opacity", 0);
     }
+    f.bloomed = false;
 
     // Petals start folded: narrow, short and twisted
     f.petalStates = f.petals.map((petal) => {
@@ -66,7 +68,7 @@
 
   function bloomFlower(plant) {
     const f = plant.flower;
-    const tl = gsap.timeline();
+    const tl = gsap.timeline({ onComplete: () => (f.bloomed = true) }); // giggles only once fully open
 
     // 1. Bud swells and wobbles — something is about to happen…
     tl.add(tweenTransform(plant.bud, { r: 0, s: 1 }, { keyframes: [

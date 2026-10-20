@@ -195,6 +195,24 @@
       }, 650);
     },
 
+    /* ---------- Part 14: little sound effects ---------- */
+
+    // A music-box "pling" that climbs higher as her energy fills up
+    pling(level) {
+      if (!this.ctx || !this.enabled) return;
+      const scale = [72, 74, 76, 79, 81, 84, 86, 88, 91, 93, 96];
+      const i = Math.min(scale.length - 1, Math.round((level / 100) * (scale.length - 1)));
+      this.bell(scale[i], this.ctx.currentTime + 0.01, 0.13, 1.3);
+    },
+
+    // Happy sparkly arpeggio at 100%
+    chime() {
+      if (!this.ctx || !this.enabled) return;
+      const now = this.ctx.currentTime + 0.02;
+      [84, 88, 91, 96, 100].forEach((m, i) => this.bell(m, now + i * 0.09, 0.14, 1.8));
+      [72, 76, 79].forEach((m) => this.bell(m, now + 0.5, 0.08, 2.4));
+    },
+
     toggle() {
       if (this.enabled) this.pause();
       else this.play();

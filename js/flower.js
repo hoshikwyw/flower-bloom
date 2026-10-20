@@ -147,7 +147,13 @@
     });
     el("path", { d: "M-3.2 3.8 Q 0 7.4 3.2 3.8", ...line }, awake);
 
-    return { face, sleep, awake };
+    // Giggling (Part 14): ^ ^ eyes + open laughing mouth
+    const joy = el("g", { class: "face__joy", opacity: 0 }, face);
+    el("path", { d: "M-8.5 -0.5 Q -5.5 -5.5 -2.5 -0.5", ...line }, joy);
+    el("path", { d: "M2.5 -0.5 Q 5.5 -5.5 8.5 -0.5", ...line }, joy);
+    el("path", { d: "M-4 3 Q 0 10 4 3 Z", fill: "#e2577f", stroke: "#5a3414", "stroke-width": 1.2, "stroke-linejoin": "round" }, joy);
+
+    return { face, sleep, awake, joy };
   }
 
   // The famous golden pompom: many fine filaments tipped with anthers
@@ -212,9 +218,9 @@
     const { group: stamenGroup, stamens } = createStamens(body, stamenCount);
 
     // The centre is a little face (it pops in where the pistil used to be)
-    const { face: pistil, sleep, awake } = createFace(body);
+    const { face: pistil, sleep, awake, joy } = createFace(body);
 
-    return { root, body, glow, sepals, petals, stamenGlow, stamenGroup, stamens, pistil, face: { sleep, awake } };
+    return { root, body, glow, sepals, petals, petalGroup, stamenGlow, stamenGroup, stamens, pistil, face: { sleep, awake, joy } };
   }
 
   // Closed bud: creamy oval cupped by two green sepals, base at (0,0)

@@ -347,6 +347,7 @@
     const music = window.Music;
     music.init();
     interact.init({ scene: els.scene, controls: els.controls, hint: $("#tap-hint"), garden, state });
+    window.Energy.build(els.controls); // Part 14: battery sits left of the music button
 
     window.Message.build(els.message, state.reducedMotion);
     window.Intro.init(els.intro, {

@@ -61,9 +61,20 @@
       if (window.Ambient && window.Ambient.running) window.Ambient.burst(x, y);
       this.hideHint();
 
+      // Every tap sends a heart into Jie Jie's battery (Part 14)
+      const energy = window.Energy;
+      if (energy) energy.flyHeart(x, y, 8);
+
       // Tapped the moon? It wakes up and blushes 🌙☺️
       if (window.Love && window.Love.hitsMoon(x, y)) {
         window.Love.moonBlush();
+        return;
+      }
+
+      // Tapped a bloomed flower? It giggles instead of getting covered by a new one
+      const flower = this.findFlower(x, y);
+      if (flower) {
+        if (energy) energy.giggle(flower, x, y);
         return;
       }
 
@@ -71,6 +82,18 @@
       const bud = this.findBud(x, y);
       if (bud) this.bloomBud(bud);
       else this.spawnFlower(x, y);
+    },
+
+    // Fully bloomed garden flower under the finger (petal area)
+    findFlower(x, y) {
+      for (const p of this.garden.plants) {
+        const f = p.flower;
+        if (!f || !f.bloomed) continue;
+        const r = f.petalGroup.getBoundingClientRect();
+        const d = Math.hypot(x - (r.left + r.width / 2), y - (r.top + r.height / 2));
+        if (d < Math.max(r.width, r.height) * 0.42) return p;
+      }
+      return null;
     },
 
     findBud(x, y) {

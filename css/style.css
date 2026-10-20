@@ -751,6 +751,165 @@ body {
   to   { transform: scaleY(1); }
 }
 
+/* ---------- Jie Jie's energy battery (Part 14) ---------- */
+.controls { align-items: flex-start; }
+
+.energy {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 6px 10px 5px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 246, 236, 0.25);
+  background: rgba(255, 255, 255, 0.1);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+
+.energy__battery {
+  position: relative;
+  display: block;
+  width: 58px;
+  height: 24px;
+  margin-right: 4px;               /* room for the cap */
+  border: 2px solid rgba(255, 246, 236, 0.9);
+  border-radius: 8px;
+}
+/* Battery cap */
+.energy__battery::after {
+  content: "";
+  position: absolute;
+  right: -6px;
+  top: 50%;
+  width: 4px;
+  height: 9px;
+  translate: 0 -50%;
+  border-radius: 0 3px 3px 0;
+  background: rgba(255, 246, 236, 0.9);
+}
+.energy__battery.is-bump { animation: battery-bump 0.45s cubic-bezier(0.34, 1.56, 0.64, 1); }
+@keyframes battery-bump {
+  0%   { transform: scale(1); }
+  35%  { transform: scale(1.18, 0.9); }
+  65%  { transform: scale(0.95, 1.06); }
+  100% { transform: scale(1); }
+}
+
+.energy__fill {
+  position: absolute;
+  inset: 2px;
+  border-radius: 5px;
+  transform-origin: left center;
+  transform: scaleX(var(--lvl, 0.2));
+  transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.6s ease;
+  background: linear-gradient(90deg, #ff5f8a, #ff8fa3);
+}
+.energy[data-state="mid"]  .energy__fill { background: linear-gradient(90deg, #ff7fa8, #ffb27a); }
+.energy[data-state="good"] .energy__fill { background: linear-gradient(90deg, #ff8fb1, #ffd75a); }
+.energy[data-state="full"] .energy__fill {
+  background: linear-gradient(90deg, #ff8fb1, #ffd75a, #9be8b0, #ff8fb1);
+  background-size: 300% 100%;
+  animation: battery-shimmer 2.5s linear infinite;
+}
+@keyframes battery-shimmer {
+  to { background-position: 300% 0; }
+}
+/* Low battery blinks a little — she's tired! */
+.energy[data-state="low"] .energy__fill { animation: low-blink 1.4s ease-in-out infinite; }
+@keyframes low-blink { 50% { opacity: 0.55; } }
+
+.energy__pct {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 11px;
+  font-weight: 600;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(60, 20, 60, 0.6);
+}
+.energy__label {
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--text-soft);
+  white-space: nowrap;
+}
+.energy.is-full {
+  box-shadow: 0 0 18px rgba(255, 215, 90, 0.55);
+  border-color: rgba(255, 215, 90, 0.6);
+}
+
+/* Heart flying from a tap into the battery (positioned by GSAP) */
+.fly-heart {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 25;
+  font-size: 20px;
+  pointer-events: none;
+  filter: drop-shadow(0 0 6px rgba(255, 143, 177, 0.9));
+}
+
+/* "hehe ♡" from a giggling flower */
+.giggle-text {
+  position: absolute;
+  z-index: 7;
+  translate: -50% 0;
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.88);
+  color: #d94f7c;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  pointer-events: none;
+  box-shadow: 0 3px 10px rgba(120, 50, 110, 0.25);
+  animation: giggle-float 1.6s ease-out forwards;
+}
+@keyframes giggle-float {
+  0%   { opacity: 0; transform: translateY(8px) scale(0.6); }
+  20%  { opacity: 1; transform: translateY(0) scale(1.1); }
+  35%  { transform: translateY(-4px) scale(1); }
+  100% { opacity: 0; transform: translateY(-46px) scale(0.95); }
+}
+
+/* 100% message card */
+.energy-toast {
+  position: absolute;
+  z-index: 15;
+  left: 50%;
+  top: 46%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: max-content;
+  max-width: calc(100% - 2 * var(--gutter));
+  padding: 14px 24px;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 10px 40px rgba(120, 50, 110, 0.35), 0 0 0 4px rgba(255, 179, 207, 0.5);
+  text-align: center;
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.5);
+  transition: opacity 0.4s ease, transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.energy-toast.is-visible { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+.energy-toast__big {
+  font-size: clamp(1.15rem, 5.2vw, 1.6rem);
+  font-weight: 600;
+  color: #d94f7c;
+}
+.energy-toast__small {
+  font-family: var(--font-script);
+  font-size: clamp(1.2rem, 5.6vw, 1.7rem);
+  font-weight: 700;
+  color: #7a5bb5;
+}
+
 /* "Tap to bloom" hint above the home indicator */
 .tap-hint {
   position: absolute;

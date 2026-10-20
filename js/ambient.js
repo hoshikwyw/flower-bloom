@@ -414,20 +414,23 @@
       p.baseX = p.x;
     },
 
-    // Little explosion of hearts + golden sparkles at a tap
-    burst(x, y) {
-      const n = this.small ? 10 : 14;
+    // Little explosion of hearts + golden sparkles at a tap.
+    // Bigger options make heart fireworks (Part 14).
+    burst(x, y, { count, speed = [40, 120], hearts = 0.34 } = {}) {
+      const n = count || (this.small ? 10 : 14);
+      const big = n > 20;
       for (let i = 0; i < n; i++) {
-        const a = rand(0, TAU);
-        const speed = rand(40, 120);
+        // Fireworks spread evenly in a ring; taps scatter randomly
+        const a = big ? (i / n) * TAU + rand(-0.1, 0.1) : rand(0, TAU);
+        const v = rand(speed[0], speed[1]);
         this.bursts.push({
           x, y,
-          vx: Math.cos(a) * speed,
-          vy: Math.sin(a) * speed - 40,
+          vx: Math.cos(a) * v,
+          vy: Math.sin(a) * v - 40,
           life: 0,
-          maxLife: rand(0.9, 1.6),
-          heart: i % 3 === 0,
-          size: rand(0.5, 0.9),
+          maxLife: rand(0.9, 1.6) * (big ? 1.3 : 1),
+          heart: Math.random() < hearts,
+          size: rand(0.5, 0.9) * (big ? 1.3 : 1),
           rot: rand(-0.4, 0.4),
         });
       }
