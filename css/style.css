@@ -1,0 +1,151 @@
+/* =========================================================
+   Flowers For Mama — base styles
+   Mobile-first, tuned for iPhone 12 mini (375 × 812 CSS px)
+   ========================================================= */
+
+/* ---------- Design tokens ---------- */
+:root {
+  /* Night sky */
+  --sky-top: #0b0a1f;
+  --sky-mid: #1c1640;
+  --sky-low: #3a2558;
+  --moon-glow: rgba(255, 236, 190, 0.35);
+  --star: #fff8e7;
+
+  /* Mesua ferrea flower */
+  --petal: #fffdf7;
+  --petal-shadow: #ece6d6;
+  --stamen: #f7c531;
+  --stamen-deep: #e09a12;
+  --stamen-tip: #fff1a8;
+
+  /* Foliage (young leaves are pink-red, mature are glossy green) */
+  --leaf-young: #d9466a;
+  --leaf: #2f6b3a;
+  --leaf-dark: #1d4527;
+  --stem: #3d5a2a;
+  --ground: #120e24;
+
+  /* Warmth & text */
+  --firefly: #ffe27a;
+  --love: #ff8fb1;
+  --text: #fff6ec;
+  --text-soft: rgba(255, 246, 236, 0.75);
+
+  /* Typography */
+  --font-body: "Quicksand", system-ui, -apple-system, sans-serif;
+  --font-script: "Dancing Script", cursive;
+  --font-myanmar: "Padauk", "Myanmar Text", "Noto Sans Myanmar", sans-serif;
+
+  /* Fluid type — readable on 375px, grows on larger screens */
+  --fs-sm: clamp(0.85rem, 3.4vw, 1rem);
+  --fs-md: clamp(1rem, 4.2vw, 1.25rem);
+  --fs-lg: clamp(1.4rem, 6vw, 2rem);
+  --fs-xl: clamp(2.6rem, 13vw, 4.5rem);
+
+  /* iPhone safe areas (notch + home indicator) */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+
+  --gutter: 16px;
+}
+
+/* ---------- Reset ---------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  height: 100%;
+  overflow: hidden;               /* full-screen experience, no scroll */
+  overscroll-behavior: none;      /* stop iOS rubber-band bounce */
+}
+
+body {
+  background: var(--sky-top);
+  color: var(--text);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-text-size-adjust: 100%;
+  touch-action: manipulation;     /* no double-tap zoom delay */
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Myanmar text gets its own font + taller line height for stacked glyphs */
+:lang(my),
+.my {
+  font-family: var(--font-myanmar);
+  line-height: 1.9;
+}
+
+/* ---------- Scene & layers ---------- */
+.scene {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;                  /* fallback */
+  height: 100dvh;                 /* real visible height on iOS Safari */
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.layer {
+  position: absolute;
+  inset: 0;
+}
+
+.layer--sky       { z-index: 1; }
+.layer--garden    { z-index: 2; }
+.layer--particles { z-index: 3; pointer-events: none; width: 100%; height: 100%; }
+.layer--message   { z-index: 4; pointer-events: none; }
+.layer--intro     { z-index: 10; }
+
+/* Temporary sky so Part 1 isn't a blank page (replaced in Part 2) */
+.layer--sky {
+  background: linear-gradient(
+    to bottom,
+    var(--sky-top) 0%,
+    var(--sky-mid) 55%,
+    var(--sky-low) 100%
+  );
+}
+
+/* ---------- Controls ---------- */
+.controls {
+  position: absolute;
+  z-index: 20;
+  top: calc(var(--safe-top) + 12px);
+  right: calc(var(--safe-right) + var(--gutter));
+  display: flex;
+  gap: 8px;
+}
+
+/* ---------- Utilities ---------- */
+.visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* Respect users who turn off motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
