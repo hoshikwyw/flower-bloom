@@ -8,13 +8,21 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <title>For Mama 🌸</title>
-  <meta name="description" content="A little garden of Mesua ferrea flowers, blooming just for you." />
+  <meta name="description" content="A little surprise, just for you 💌" />
 
-  <!-- Fonts: Quicksand (body), Dancing Script (name), Padauk (Myanmar text) -->
+  <!-- Link preview (Messenger / Viber / Telegram) — keeps the surprise hidden -->
+  <meta property="og:title" content="For Mama 💌" />
+  <meta property="og:description" content="A little surprise, just for you. Tap to open 🌸" />
+  <meta property="og:type" content="website" />
+
+  <!-- Favicon: a tiny Mesua flower -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-50 -50 100 100'%3E%3Cg fill='%23fffdf7' stroke='%23eadfc3' stroke-width='2'%3E%3Cellipse cy='-22' rx='17' ry='22'/%3E%3Cellipse cy='22' rx='17' ry='22'/%3E%3Cellipse cx='-22' rx='22' ry='17'/%3E%3Cellipse cx='22' rx='22' ry='17'/%3E%3C/g%3E%3Ccircle r='13' fill='%23f7c531'/%3E%3C/svg%3E" />
+
+  <!-- Fonts: Quicksand (body), Dancing Script (name), Padauk (Myanmar text) — only the weights we use -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
-    href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@500;700&family=Padauk:wght@400;700&family=Quicksand:wght@400;500;600&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Padauk&family=Quicksand:wght@400;500&display=swap"
     rel="stylesheet"
   />
 
@@ -89,8 +97,8 @@
     <p id="tap-hint" class="tap-hint my" lang="my">နှိပ်ပြီး ပန်းလေးတွေ ပွင့်စေပါ 🌸</p>
   </main>
 
-  <!-- GSAP for timeline animations -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <!-- GSAP for timeline animations (local copy, so it works even if a CDN is blocked/slow) -->
+  <script src="js/vendor/gsap.min.js"></script>
   <script src="js/flower.js"></script>
   <script src="js/growth.js"></script>
   <script src="js/bloom.js"></script>

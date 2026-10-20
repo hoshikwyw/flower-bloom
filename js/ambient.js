@@ -122,12 +122,9 @@
       if (!prev) return;
       const dx = x - prev.x;
       if (Math.abs(dx) < 0.5) return;
-      for (const p of this.plants) {
-        const r = p.head.getBoundingClientRect();
-        const cx = r.left + r.width / 2;
-        const cy = r.top + r.height / 2;
-        const reach = Math.max(70, r.width);
-        const dist = Math.hypot(x - cx, y - cy);
+      for (const { plant: p, head } of this.measure()) {
+        const reach = Math.max(70, head.size);
+        const dist = Math.hypot(x - head.x, y - head.y);
         if (dist < reach) {
           const k = 1 - dist / reach;
           p.push = Math.max(-9, Math.min(9, p.push + dx * 0.12 * k));
@@ -159,14 +156,29 @@
 
     /* ---------- Particles ---------- */
 
+    // Screen positions of flower heads, cached for 0.3s.
+    // Reading layout every frame (right after we write transforms) is slow on phones.
+    measure() {
+      if (this.cache && this.time - this.cache.at < 0.3 && this.cache.plants === this.plants) {
+        return this.cache.items;
+      }
+      const items = this.plants.map((plant) => {
+        const r = plant.head.getBoundingClientRect();
+        const head = { x: r.left + r.width / 2, y: r.top + r.height / 2, size: r.width };
+        let center = null;
+        if (plant.flower) {
+          const s = plant.flower.stamenGlow.getBoundingClientRect();
+          center = { x: s.left + s.width / 2, y: s.top + s.height / 2, r: s.width / 3 };
+        }
+        return { plant, head, center };
+      });
+      this.cache = { at: this.time, plants: this.plants, items };
+      return items;
+    },
+
     // Centres of bloomed flowers in screen pixels (pollen comes from here)
     flowerCenters() {
-      return this.plants
-        .filter((p) => p.flower)
-        .map((p) => {
-          const r = p.flower.stamenGlow.getBoundingClientRect();
-          return { x: r.left + r.width / 2, y: r.top + r.height / 2, r: r.width / 3 };
-        });
+      return this.measure().filter((m) => m.center).map((m) => m.center);
     },
 
     makeFirefly() {

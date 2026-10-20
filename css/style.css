@@ -35,7 +35,8 @@
   /* Typography */
   --font-body: "Quicksand", system-ui, -apple-system, sans-serif;
   --font-script: "Dancing Script", cursive;
-  --font-myanmar: "Padauk", "Myanmar Text", "Noto Sans Myanmar", sans-serif;
+  /* Padauk from Google Fonts; iPhone has Myanmar Sangam MN built in as a fallback */
+  --font-myanmar: "Padauk", "Myanmar Sangam MN", "Myanmar Text", "Noto Sans Myanmar", sans-serif;
 
   /* Fluid type — readable on 375px, grows on larger screens */
   --fs-sm: clamp(0.85rem, 3.4vw, 1rem);
@@ -78,6 +79,7 @@ body {
   touch-action: manipulation;     /* no double-tap zoom delay */
   user-select: none;
   -webkit-user-select: none;
+  -webkit-touch-callout: none;    /* no iOS long-press popup when holding a flower */
 }
 
 /* Myanmar text gets its own font + taller line height for stacked glyphs */
@@ -501,6 +503,18 @@ body {
 @keyframes love-glow {
   from { text-shadow: 0 0 12px rgba(11, 10, 31, 0.9), 0 0 10px rgba(255, 143, 177, 0.3); }
   to   { text-shadow: 0 0 12px rgba(11, 10, 31, 0.9), 0 0 26px rgba(255, 143, 177, 0.9); }
+}
+
+/* ---------- Phone in landscape (Part 9) ---------- */
+@media (orientation: landscape) and (max-height: 520px) {
+  .layer--message { padding-top: calc(var(--safe-top) + 4vh); }
+  .message__name  { font-size: 12vh; }
+  .message__page  { font-size: 4.6vh; margin-top: 1vh; }
+  .moon           { top: calc(var(--safe-top) + 6vh); width: 14vh; }
+  .envelope       { scale: 0.8; } /* separate from the float animation's transform */
+  .intro__button  { gap: 10px; padding: 8px; }
+  .intro__name    { font-size: 13vh; }
+  .tap-hint       { bottom: calc(var(--safe-bottom) + 8px); }
 }
 
 /* Gentle fade-in of the whole sky on load */

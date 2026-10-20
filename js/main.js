@@ -161,13 +161,18 @@
       const top = this.groundTop();
       const plants = [];
 
+      // Phone in landscape: shorter plants so they don't cover the message
+      const short = w > h && h < 520;
+      const frontH = short ? [0.19, 0.06] : [0.3, 0.1]; // [base, extra for the middle]
+      const backH = short ? [0.13, 0.17] : [0.2, 0.27];  // [min, max]
+
       // Back row: smaller, mix of buds and flowers
       for (let i = 0; i < backCount; i++) {
         plants.push({
           x: w * (0.1 + (0.8 * i) / (backCount - 1)) + rand(-w * 0.02, w * 0.02),
           lean: i === 0 ? 1 : i === backCount - 1 ? -1 : 0,
           y: top - rand(4, 14),
-          height: h * rand(0.2, 0.27),
+          height: h * rand(backH[0], backH[1]),
           scale: base * 0.65,
           kind: i % 2 === 0 ? "bud" : "flower",
           depth: "back",
@@ -183,7 +188,7 @@
           x: w * (0.08 + pos * 0.84) + rand(-w * 0.02, w * 0.02),
           lean: i === 0 ? 1 : i === frontCount - 1 ? -1 : 0,
           y: top + rand(4, 16),
-          height: h * (0.3 + centerness * 0.1 + rand(-0.02, 0.02)),
+          height: h * (frontH[0] + centerness * frontH[1] + rand(-0.02, 0.02)),
           scale: base,
           kind: "flower",
           depth: "front",

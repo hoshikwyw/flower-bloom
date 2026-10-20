@@ -136,6 +136,10 @@
     },
 
     async play() {
+      // Make sure the Myanmar + script fonts are ready (max 2s wait on slow networks)
+      if (document.fonts && document.fonts.ready) {
+        await Promise.race([document.fonts.ready, wait(2000)]);
+      }
       this.root.classList.add("is-active");
       await wait(100);
       this.nameEl.classList.add("is-visible");
