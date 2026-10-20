@@ -1,5 +1,5 @@
 /* =========================================================
-   Part 7 — Intro envelope + Myanmar love message
+   Part 7 — Intro envelope + love message
    ========================================================= */
 
 (() => {
@@ -7,22 +7,22 @@
 
   const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 
-  /* ---------- The message (Myanmar only) ----------
-     Shown a page at a time; the last page stays on screen. */
-  const NAME = "Mama";
+  /* ---------- The message ----------
+     Shown a page at a time (two lines each); the last page stays on screen. */
+  const NAME = "Jie Jie";
   const PAGES = [
-    ["ဒီရက်ပိုင်း အလုပ်တွေ များနေတယ်နော်", "ပင်ပန်းနေတာ ကိုယ်သိပါတယ်"],
-    ["ခဏလေး အနားယူပြီး", "ဒီပန်းလေးတွေကို ကြည့်ပါဦး 🌸"],
-    ["ကံ့ကော်ပန်းလေးတွေ", "မင်းအတွက် ပွင့်လာတာပါ"],
-    ["မင်းက ကိုယ်ထင်တာထက်", "ပိုသန်မာပါတယ် 💛"],
-    ["ဘယ်လောက်ပဲ ပင်ပန်းပင်ပန်း", "ကိုယ် မင်းဘေးမှာ အမြဲရှိမယ်"],
-    ["အားတင်းထားနော်", "အရမ်းချစ်တယ် ❤️"],
+    ["You've been working so hard lately…", "I know you're tired, Jie Jie"],
+    ["So take a little break with me", "and watch these flowers bloom 🌸"],
+    ["Every single one of them", "bloomed just for you"],
+    ["You're stronger than you know", "and you're never alone 💛"],
+    ["No matter how tired you get,", "I'll always be right here"],
+    ["Rest well, and smile a little", "I love you so much ❤️"],
   ];
 
-  /* ---------- Myanmar-safe "letters" ----------
-     Splitting Myanmar per code point breaks vowels/medials
-     (e.g. ေ ြ ် ္). Group each base letter with the marks that
-     follow it, and join stacked consonants across ္ (virama). */
+  /* ---------- Typewriter "letters" ----------
+     Keeps emoji (❤️ = ❤ + U+FE0F) and any combining marks
+     (e.g. Myanmar vowels ေ ြ ်, if the text is ever changed back)
+     together with the character before them, so nothing renders broken. */
   const isMyanmarMark = (c) =>
     (c >= 0x102b && c <= 0x103e) || (c >= 0x1056 && c <= 0x1059) ||
     (c >= 0x105e && c <= 0x1060) || (c >= 0x1062 && c <= 0x1064) ||
@@ -55,7 +55,6 @@
       // Name in script, one letter at a time
       const name = document.createElement("h1");
       name.className = "message__name";
-      name.lang = "en"; // keep the script font (the message layer is lang="my")
       name.setAttribute("aria-label", NAME);
       [...NAME, " ", "♡"].forEach((ch, i) => {
         const s = document.createElement("span");
@@ -67,8 +66,7 @@
       });
 
       const page = document.createElement("div");
-      page.className = "message__page my";
-      page.lang = "my";
+      page.className = "message__page";
 
       root.append(name, page);
       this.nameEl = name;

@@ -1,5 +1,5 @@
 /* =========================================================
-   Flowers For Mama — main entry
+   Flowers For Jie Jie — main entry
    Each part of the experience lives in its own init function,
    filled in as we build it.
    ========================================================= */

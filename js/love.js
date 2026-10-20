@@ -1,7 +1,7 @@
 /* =========================================================
    Part 13 — Love everywhere
    • Heart constellation: stars pop in one by one and connect
-     into a big heart framing "Mama" + the message
+     into a big heart framing "Jie Jie" + the message
    • Moon with a sleepy blushing face; tap it → happy + extra blush
    ========================================================= */
 

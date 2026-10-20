@@ -1,5 +1,5 @@
 /* =========================================================
-   Flowers For Mama — base styles
+   Flowers For Jie Jie — base styles
    Mobile-first, tuned for iPhone 12 mini (375 × 812 CSS px)
    ========================================================= */
 
@@ -40,8 +40,6 @@
   /* Typography */
   --font-body: "Quicksand", system-ui, -apple-system, sans-serif;
   --font-script: "Dancing Script", cursive;
-  /* Padauk from Google Fonts; iPhone has Myanmar Sangam MN built in as a fallback */
-  --font-myanmar: "Padauk", "Myanmar Sangam MN", "Myanmar Text", "Noto Sans Myanmar", sans-serif;
 
   /* Fluid type — readable on 375px, grows on larger screens */
   --fs-sm: clamp(0.85rem, 3.4vw, 1rem);
@@ -85,13 +83,6 @@ body {
   user-select: none;
   -webkit-user-select: none;
   -webkit-touch-callout: none;    /* no iOS long-press popup when holding a flower */
-}
-
-/* Myanmar text gets its own font + taller line height for stacked glyphs */
-:lang(my),
-.my {
-  font-family: var(--font-myanmar);
-  line-height: 1.9;
 }
 
 /* ---------- Scene & layers ---------- */
@@ -547,7 +538,12 @@ body {
   font-weight: 700;
   line-height: 1;
 }
-.intro__to .my { font-size: var(--fs-lg); line-height: 1.4; }
+.intro__for {
+  font-size: var(--fs-lg);
+  font-weight: 500;
+  line-height: 1.4;
+  opacity: 0.9;
+}
 
 .intro__hint {
   font-size: var(--fs-sm);
@@ -615,9 +611,10 @@ body {
 .message__page {
   width: 100%;
   max-width: 34rem;
-  min-height: calc(2 * 1.9em + 1rem);
+  min-height: calc(2 * 1.65em + 1rem);
   margin-top: 2.2vh;
-  font-size: clamp(1.05rem, 4.8vw, 1.5rem);
+  font-size: clamp(1rem, 4.5vw, 1.45rem);
+  font-weight: 500;
   opacity: 0;
   transform: translateY(8px);
   transition: opacity 0.6s ease, transform 0.6s ease, filter 0.6s ease;
@@ -626,7 +623,7 @@ body {
 .message__page.is-leaving { opacity: 0; transform: translateY(-10px); filter: blur(4px); }
 
 .message__line {
-  line-height: 1.9;
+  line-height: 1.65;
   color: var(--text);
   text-shadow: 0 0 12px rgba(11, 10, 31, 0.9), 0 0 18px rgba(255, 143, 177, 0.35);
 }
@@ -765,7 +762,7 @@ body {
   max-width: calc(100% - 2 * var(--gutter));
   padding: 6px 16px;
   border-radius: 999px;
-  background: rgba(11, 10, 31, 0.45);
+  background: rgba(47, 37, 96, 0.72);
   -webkit-backdrop-filter: blur(6px);
   backdrop-filter: blur(6px);
   font-size: var(--fs-sm);
