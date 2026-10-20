@@ -32,6 +32,11 @@
     f.stamenGlow.setAttribute("opacity", 0);
     f.sepals.setAttribute("transform", "scale(0.4)");
     f.pistil.setAttribute("transform", "scale(0.0001)");
+    if (f.body) f.body.removeAttribute("transform");
+    if (f.face) {
+      f.face.sleep.setAttribute("opacity", 1);
+      f.face.awake.setAttribute("opacity", 0);
+    }
 
     // Petals start folded: narrow, short and twisted
     f.petalStates = f.petals.map((petal) => {
@@ -112,7 +117,35 @@
     ] }, burstAt);
     tl.to(f.glow, { attr: { opacity: 1 }, duration: 1.4, ease: "sine.out" }, burstAt);
 
-    // 6. Golden ring ripples outward and fades
+    // 6. Squishy jelly bounce of the whole flower as it bursts open
+    if (f.body) {
+      const j = { sx: 1, sy: 1 };
+      const applyJelly = () =>
+        f.body.setAttribute("transform", `scale(${j.sx.toFixed(3)} ${j.sy.toFixed(3)})`);
+      tl.to(j, {
+        keyframes: [
+          { sx: 1.13, sy: 0.88, duration: 0.13, ease: "power2.out" },
+          { sx: 0.93, sy: 1.09, duration: 0.15, ease: "sine.inOut" },
+          { sx: 1.04, sy: 0.97, duration: 0.13, ease: "sine.inOut" },
+          { sx: 1, sy: 1, duration: 0.22, ease: "sine.out" },
+        ],
+        onUpdate: applyJelly,
+      }, burstAt + 0.1);
+    }
+
+    // 7. The face wakes up: sleepy eyes → sparkly eyes + smile, with a happy "boing"
+    if (f.face) {
+      const wake = burstAt + 1.0;
+      tl.to(f.face.sleep, { attr: { opacity: 0 }, duration: 0.15 }, wake);
+      tl.to(f.face.awake, { attr: { opacity: 1 }, duration: 0.15 }, wake);
+      tl.add(tweenTransform(f.pistil, { r: 0, s: 1 }, { keyframes: [
+        { r: -8, s: 1.22, duration: 0.16 },
+        { r: 6, s: 0.95, duration: 0.16 },
+        { r: 0, s: 1, duration: 0.2 },
+      ] }, { ease: "sine.inOut" }), wake);
+    }
+
+    // 8. Golden ring ripples outward and fades
     tl.fromTo(f.ring,
       { attr: { r: 10, opacity: 0.9, "stroke-width": 3 } },
       { attr: { r: 110, opacity: 0, "stroke-width": 0.5 }, duration: 1.2, ease: "power2.out" },

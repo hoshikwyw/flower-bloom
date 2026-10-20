@@ -38,9 +38,19 @@
       { gradientUnits: "userSpaceOnUse", cx: 0, cy: 0, r: 72 },
       [["0%", "#f2e4bf"], ["22%", "#fbf4e2"], ["55%", "#fffdf7"], ["100%", "#ffffff"]]);
 
+    // Cute pink blush toward the petal tips (Part 12)
+    gradient(defs, "radialGradient", "gPetalBlush",
+      { gradientUnits: "userSpaceOnUse", cx: 0, cy: 0, r: 72 },
+      [["0%", "#ffb3cf", 0], ["55%", "#ffb3cf", 0], ["82%", "#ffa9c9", 0.35], ["100%", "#ff8fb8", 0.6]]);
+
+    // Kawaii face: warm golden cheeks-and-all centre
+    gradient(defs, "radialGradient", "gFace",
+      { cx: "40%", cy: "35%", r: "70%" },
+      [["0%", "#fff3b0"], ["55%", "#ffd75a"], ["100%", "#f2b42a"]]);
+
     // Soft halo behind each flower
     gradient(defs, "radialGradient", "gFlowerGlow", {},
-      [["0%", "#fff6dc", 0.35], ["60%", "#ffe7a8", 0.08], ["100%", "#ffe7a8", 0]]);
+      [["0%", "#fff0f6", 0.45], ["60%", "#ffd1e4", 0.12], ["100%", "#ffd1e4", 0]]);
 
     // Golden glow behind the stamen cluster
     gradient(defs, "radialGradient", "gStamenGlow", {},
@@ -82,20 +92,62 @@
     el("path", {
       d: PETAL_PATH,
       fill: "url(#gPetal)",
-      stroke: "#eadfc3",
-      "stroke-width": 0.8,
+      stroke: "#f4c3d6",
+      "stroke-width": 1.4,
+      "stroke-linejoin": "round",
     }, g);
+    // Pink blush toward the tip
+    el("path", { d: PETAL_PATH, fill: "url(#gPetalBlush)" }, g);
     PETAL_VEINS.forEach((d) =>
       el("path", {
         d,
         fill: "none",
-        stroke: "#e9dcc0",
+        stroke: "#f0c9d8",
         "stroke-width": 0.7,
         "stroke-linecap": "round",
-        opacity: 0.55,
+        opacity: 0.6,
       }, g)
     );
+    // Little glossy shine near the tip
+    el("ellipse", {
+      cx: -13, cy: -54, rx: 4, ry: 7.5,
+      fill: "#ffffff",
+      opacity: 0.85,
+      transform: "rotate(-28 -13 -54)",
+    }, g);
+    el("circle", { cx: -6, cy: -62, r: 1.8, fill: "#ffffff", opacity: 0.9 }, g);
     return g;
+  }
+
+  /* ---------- Kawaii face (Part 12) ----------
+     Sits on the golden centre. Starts asleep (closed eyes),
+     wakes up with open sparkly eyes + smile when the flower blooms. */
+  function createFace(parent) {
+    const face = el("g", { class: "face" }, parent);
+    el("circle", { r: 17, fill: "url(#gFace)", stroke: "#e9a21f", "stroke-width": 1 }, face);
+
+    // Rosy cheeks
+    el("ellipse", { cx: -9.5, cy: 4.5, rx: 3.8, ry: 2.4, fill: "#ff8fb1", opacity: 0.8 }, face);
+    el("ellipse", { cx: 9.5, cy: 4.5, rx: 3.8, ry: 2.4, fill: "#ff8fb1", opacity: 0.8 }, face);
+
+    const line = { fill: "none", stroke: "#5a3414", "stroke-width": 1.5, "stroke-linecap": "round" };
+
+    // Asleep: ︶ ︶ eyes, tiny mouth
+    const sleep = el("g", { class: "face__sleep" }, face);
+    el("path", { d: "M-8.5 -2.5 Q -5.5 0.8 -2.5 -2.5", ...line }, sleep);
+    el("path", { d: "M2.5 -2.5 Q 5.5 0.8 8.5 -2.5", ...line }, sleep);
+    el("path", { d: "M-1.5 5.5 L1.5 5.5", ...line }, sleep);
+
+    // Awake: shiny eyes that blink, happy smile
+    const awake = el("g", { class: "face__awake", opacity: 0 }, face);
+    const eyes = el("g", { class: "face__eyes", style: `--blink:${rand(3.5, 6).toFixed(1)}s;--blink-delay:${rand(-5, 0).toFixed(1)}s` }, awake);
+    [-5.5, 5.5].forEach((x) => {
+      el("ellipse", { cx: x, cy: -2, rx: 2.3, ry: 2.9, fill: "#3e220c" }, eyes);
+      el("circle", { cx: x - 0.8, cy: -3.1, r: 0.95, fill: "#ffffff" }, eyes);
+    });
+    el("path", { d: "M-3.2 3.8 Q 0 7.4 3.2 3.8", ...line }, awake);
+
+    return { face, sleep, awake };
   }
 
   // The famous golden pompom: many fine filaments tipped with anthers
@@ -134,11 +186,13 @@
 
   function createFlower(parent, { stamens: stamenCount = 130 } = {}) {
     const root = el("g", { class: "flower" }, parent);
+    // Inner body gets the squishy "jelly" bounce; root is free for wind nodding
+    const body = el("g", { class: "flower__body" }, root);
 
-    const glow = el("circle", { class: "flower__glow", r: 100, fill: "url(#gFlowerGlow)" }, root);
+    const glow = el("circle", { class: "flower__glow", r: 100, fill: "url(#gFlowerGlow)" }, body);
 
     // 4 small green sepals peeking out between petals
-    const sepals = el("g", { class: "flower__sepals" }, root);
+    const sepals = el("g", { class: "flower__sepals" }, body);
     for (let i = 0; i < 4; i++) {
       el("ellipse", {
         cx: 0, cy: -20, rx: 9, ry: 20,
@@ -148,21 +202,19 @@
     }
 
     // 4 petals, slightly irregular like a real flower
-    const petalGroup = el("g", { class: "flower__petals" }, root);
+    const petalGroup = el("g", { class: "flower__petals" }, body);
     const offset = rand(0, 90);
     const petals = [0, 1, 2, 3].map((i) =>
       createPetal(petalGroup, i * 90 + offset + rand(-6, 6))
     );
 
-    const stamenGlow = el("circle", { class: "flower__stamen-glow", r: 42, fill: "url(#gStamenGlow)" }, root);
-    const { group: stamenGroup, stamens } = createStamens(root, stamenCount);
+    const stamenGlow = el("circle", { class: "flower__stamen-glow", r: 42, fill: "url(#gStamenGlow)" }, body);
+    const { group: stamenGroup, stamens } = createStamens(body, stamenCount);
 
-    // Pistil in the middle
-    const pistil = el("g", { class: "flower__pistil" }, root);
-    el("circle", { r: 4.5, fill: "#c9821a" }, pistil);
-    el("circle", { r: 2, fill: "#7a4e10" }, pistil);
+    // The centre is a little face (it pops in where the pistil used to be)
+    const { face: pistil, sleep, awake } = createFace(body);
 
-    return { root, glow, sepals, petals, stamenGlow, stamenGroup, stamens, pistil };
+    return { root, body, glow, sepals, petals, stamenGlow, stamenGroup, stamens, pistil, face: { sleep, awake } };
   }
 
   // Closed bud: creamy oval cupped by two green sepals, base at (0,0)
@@ -172,8 +224,65 @@
     const sepalPath = "M0 2 C -17 -2, -19 -20, -7 -30 C -10 -18, -6 -7, 0 2 Z";
     el("path", { class: "bud__sepal", d: sepalPath, fill: "#4d7a3a" }, root);
     el("path", { class: "bud__sepal", d: sepalPath, fill: "#3d6a2e", transform: "scale(-1,1)" }, root);
-    el("ellipse", { cx: -4, cy: -27, rx: 3, ry: 5, fill: "#ffffff", opacity: 0.6 }, root);
+    // Pink blushing tip + shine
+    el("ellipse", { cx: 0, cy: -31, rx: 8, ry: 6, fill: "#ffb3cf", opacity: 0.55 }, root);
+    el("ellipse", { cx: -4, cy: -27, rx: 3, ry: 5, fill: "#ffffff", opacity: 0.75 }, root);
     return root;
+  }
+
+  /* ---------- Foreground: grass tufts + baby flowers (Part 12) ----------
+     Each item: <g translate> → <g .fore-item> (grows in) → <g .fore-sway> (sways) */
+  function createForeground(parent, { width, top, bottom, small }) {
+    const fore = el("g", { class: "garden__fore" }, parent);
+    const tufts = Math.round(width / (small ? 20 : 26));
+    const babies = Math.round(width / (small ? 34 : 48));
+    const items = [];
+
+    const holder = (x, y) => {
+      const pos = el("g", { transform: `translate(${x.toFixed(1)} ${y.toFixed(1)})` }, fore);
+      const item = el("g", { class: "fore-item", style: `--d:${rand(0, 1.6).toFixed(2)}s` }, pos);
+      const sway = el("g", {
+        class: "fore-sway",
+        style: `--sd:${rand(2.2, 3.6).toFixed(2)}s;--sdelay:${rand(-3, 0).toFixed(2)}s`,
+      }, item);
+      items.push({ y, pos });
+      return sway;
+    };
+
+    const greens = ["#5fae6b", "#4a9a58", "#7cc28a", "#3f8a4c"];
+    for (let i = 0; i < tufts; i++) {
+      const x = (i + rand(0.1, 0.9)) * (width / tufts);
+      const g = holder(x, rand(top, bottom));
+      const blades = 4 + ((Math.random() * 3) | 0);
+      for (let b = 0; b < blades; b++) {
+        const h = rand(16, 32) * (small ? 1 : 1.2);
+        const lean = rand(-9, 9);
+        const bx = rand(-6, 6);
+        el("path", {
+          d: `M${bx - 2} 0 Q ${bx + lean * 0.4} ${-h * 0.6} ${bx + lean} ${-h} Q ${bx + lean * 0.3} ${-h * 0.5} ${bx + 2} 0 Z`,
+          fill: greens[(Math.random() * greens.length) | 0],
+        }, g);
+      }
+    }
+
+    const petalColors = ["#ffc1d9", "#ffffff", "#e8cfff", "#ffd6e7"];
+    for (let i = 0; i < babies; i++) {
+      const x = (i + rand(0.15, 0.85)) * (width / babies);
+      const g = holder(x, rand(top + 6, bottom));
+      const h = rand(12, 24);
+      el("path", { d: `M0 0 Q ${rand(-3, 3)} ${-h / 2} 0 ${-h}`, fill: "none", stroke: "#4a9a58", "stroke-width": 1.4 }, g);
+      const head = el("g", { transform: `translate(0 ${-h}) scale(${rand(1, 1.4).toFixed(2)})` }, g);
+      const color = petalColors[(Math.random() * petalColors.length) | 0];
+      for (let p = 0; p < 5; p++) {
+        const a = (p / 5) * Math.PI * 2;
+        el("circle", { cx: (Math.cos(a) * 3.6).toFixed(2), cy: (Math.sin(a) * 3.6).toFixed(2), r: 2.9, fill: color }, head);
+      }
+      el("circle", { r: 2.1, fill: "#ffd75a" }, head);
+    }
+
+    // Draw nearer (lower) items last so they overlap correctly
+    items.sort((a, b) => a.y - b.y).forEach(({ pos }) => fore.appendChild(pos));
+    return fore;
   }
 
   // Long, narrow lanceolate leaf drawn from base (0,0) along +x.
@@ -301,5 +410,5 @@
     return { root, sway, stem, leaves, head, headInner, bud, flower, kind, depth, scale, height, x };
   }
 
-  window.MesuaFlower = { NS, el, addDefs, createPlant, createFlower, createBud };
+  window.MesuaFlower = { NS, el, addDefs, createPlant, createFlower, createBud, createForeground };
 })();

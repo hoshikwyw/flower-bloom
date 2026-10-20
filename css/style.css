@@ -296,6 +296,38 @@ body {
   opacity: 0.78;
 }
 
+/* ---------- Cute flowers (Part 12) ---------- */
+
+/* Awake faces blink every few seconds */
+.face__eyes {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: blink var(--blink, 4.5s) ease-in-out var(--blink-delay, 0s) infinite;
+}
+@keyframes blink {
+  0%, 90%, 100% { transform: scaleY(1); }
+  94%           { transform: scaleY(0.1); }
+}
+
+/* Grass & baby flowers: spring up when the garden grows, then sway */
+.fore-item {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  transform: scale(0.6, 0);
+  transition: transform 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) var(--d, 0s);
+}
+.garden__fore.is-grown .fore-item { transform: none; }
+
+.fore-sway {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: grass-sway var(--sd, 3s) ease-in-out var(--sdelay, 0s) infinite alternate;
+}
+@keyframes grass-sway {
+  from { transform: rotate(-5deg); }
+  to   { transform: rotate(5deg); }
+}
+
 /* ---------- Intro envelope (Part 7) ---------- */
 .layer--intro {
   display: grid;

@@ -138,7 +138,7 @@
         const dur = rand(70, 130);
         c.style.top = `${high ? rand(0.5, 4) : rand(38, 50)}%`;
         c.style.setProperty("--w", `${w.toFixed(0)}px`);
-        c.style.setProperty("--o", rand(0.82, 0.95).toFixed(2));
+        c.style.setProperty("--o", rand(0.9, 1).toFixed(2));
         c.style.setProperty("--dur", `${dur.toFixed(0)}s`);
         c.style.setProperty("--delay", `${(-rand(0, dur)).toFixed(0)}s`); // start mid-journey
         c.style.setProperty("--bob", `${rand(4, 8).toFixed(1)}s`);
@@ -257,6 +257,16 @@
         createPlant(spec.depth === "back" ? back : front, spec)
       );
 
+      // Part 12: grass tufts + baby flowers in front, hiding the stem bases
+      const top = this.groundTop();
+      this.fore = window.MesuaFlower.createForeground(svg, {
+        width: state.width,
+        top: top + 6,
+        bottom: state.height - 8,
+        small: state.width <= 500,
+      });
+      if (this.played.growth || state.reducedMotion) this.fore.classList.add("is-grown");
+
       els.garden.replaceChildren(svg);
       this.svg = svg;
 
@@ -284,6 +294,8 @@
         const tl = this.timelines[name];
         const done = this.played[name] || !tl || tl.progress() === 1;
         this.played[name] = true;
+        // Grass & baby flowers pop up together with the stems
+        if (name === "growth" && this.fore) this.fore.classList.add("is-grown");
         if (done) return resolve();
         tl.eventCallback("onComplete", resolve);
         tl.play();
