@@ -581,6 +581,9 @@
 
       for (const b of this.butterflies) this.drawButterfly(b, t);
       ctx.globalAlpha = 1;
+
+      // Part 15: the giant petal heart
+      if (window.Finale && window.Finale.active) window.Finale.render(ctx, this.dt || 0.016);
     },
 
     loop(now) {
@@ -588,6 +591,7 @@
       const dt = this.last ? Math.min((now - this.last) / 1000, 0.05) : 0.016;
       this.last = now;
       this.time += dt;
+      this.dt = dt;
 
       const t = this.time;
       const wind = this.windAt(t);

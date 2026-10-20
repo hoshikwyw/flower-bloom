@@ -145,6 +145,10 @@ body {
   stroke-width: 1.1;
   stroke-linecap: round;
 }
+/* The petal heart takes over in the finale (Part 15) */
+.constellation { transition: opacity 1.5s ease; }
+.constellation.is-dimmed { opacity: 0.3; }
+
 /* Once drawn, the whole heart breathes softly */
 .constellation.is-drawn .constellation__lines {
   animation: heart-breathe 3.2s ease-in-out infinite alternate;

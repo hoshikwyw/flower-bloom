@@ -36,9 +36,51 @@
       return {
         cx: w / 2,
         cy: (top + bottom) / 2,
-        width: Math.min(w * 0.9, 540),
+        width: Math.min(w * 0.85, 540),
         height: bottom - top,
       };
+    },
+
+    /**
+     * n points spaced evenly along the heart outline (Part 15 finale).
+     * k < 1 gives a slightly smaller inner heart. Each point has the
+     * outward-facing angle so petals can point away from the centre.
+     */
+    heartPoints(n, k = 1, box = this.frame()) {
+      if (!box) return [];
+      const sx = (box.width / 32) * k;
+      const sy = (box.height / 29) * k;
+      const map = (t) => {
+        const p = heartPoint(t);
+        return { x: box.cx + p.x * sx, y: box.cy - (p.y + 2.5) * sy };
+      };
+      // Sample densely, then pick points at equal distances along the curve
+      const S = 400;
+      const samples = [];
+      let total = 0;
+      for (let i = 0; i <= S; i++) {
+        const pt = map((i / S) * Math.PI * 2);
+        if (i) total += Math.hypot(pt.x - samples[i - 1].x, pt.y - samples[i - 1].y);
+        samples.push({ ...pt, d: total });
+      }
+      const out = [];
+      let j = 0;
+      for (let i = 0; i < n; i++) {
+        const want = (i / n) * total;
+        while (j < S && samples[j + 1].d < want) j++;
+        const p = samples[j];
+        out.push({
+          x: p.x,
+          y: p.y,
+          angle: Math.atan2(p.y - box.cy, p.x - box.cx) + Math.PI / 2,
+        });
+      }
+      return out;
+    },
+
+    // The star heart steps back once the petal heart takes its place
+    dimConstellation() {
+      if (this.svg) this.svg.classList.add("is-dimmed");
     },
 
     build() {

@@ -361,7 +361,11 @@
         interact.enable();
         els.scene.classList.add("is-interactive");
         await garden.play("growth");
-        window.Message.play().then(() => setTimeout(() => interact.showHint(), 1500));
+        window.Message.play().then(() => {
+          // Part 15: after the last line, petals swirl into a giant beating heart
+          setTimeout(() => window.Finale.start(), 1200);
+          setTimeout(() => interact.showHint(), 7500);
+        });
         await garden.play("bloom");
         if (motion) ambient.startParticles();
         // Part 13: stars connect into a heart around her name
@@ -369,6 +373,7 @@
       },
     });
     window.Love.init();
+    window.Finale.init();
   }
 
   document.addEventListener("DOMContentLoaded", init);
