@@ -24,7 +24,34 @@
   <main id="scene" class="scene" aria-label="A garden of blooming Mesua ferrea flowers">
 
     <!-- Layer 1: night sky, stars, moon (Part 2) -->
-    <div id="sky" class="layer layer--sky" aria-hidden="true"></div>
+    <div id="sky" class="layer layer--sky" aria-hidden="true">
+      <div class="sky__glow"></div>
+      <div id="stars" class="sky__stars"></div>
+      <div id="shooting-stars" class="sky__shooting"></div>
+
+      <div class="moon">
+        <div class="moon__halo"></div>
+        <div class="moon__body"></div>
+      </div>
+
+      <!-- Soft rolling hills; flowers will grow from the front hill -->
+      <svg class="ground" viewBox="0 0 400 160" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="hillBack" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#2a2150" />
+            <stop offset="100%" stop-color="#171230" />
+          </linearGradient>
+          <linearGradient id="hillFront" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#1a1532" />
+            <stop offset="100%" stop-color="#0d0a1c" />
+          </linearGradient>
+        </defs>
+        <path class="ground__back" fill="url(#hillBack)"
+          d="M0 70 C 60 40, 120 45, 180 62 S 300 30, 400 55 L 400 160 L 0 160 Z" />
+        <path class="ground__front" fill="url(#hillFront)"
+          d="M0 105 C 70 85, 140 95, 210 100 S 330 82, 400 98 L 400 160 L 0 160 Z" />
+      </svg>
+    </div>
 
     <!-- Layer 2: ground + flowers (Parts 3–5) -->
     <div id="garden" class="layer layer--garden" aria-hidden="true"></div>

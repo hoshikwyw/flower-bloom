@@ -109,14 +109,142 @@ body {
 .layer--message   { z-index: 4; pointer-events: none; }
 .layer--intro     { z-index: 10; }
 
-/* Temporary sky so Part 1 isn't a blank page (replaced in Part 2) */
+/* ---------- Sky (Part 2) ---------- */
 .layer--sky {
+  overflow: hidden;
   background: linear-gradient(
     to bottom,
     var(--sky-top) 0%,
     var(--sky-mid) 55%,
     var(--sky-low) 100%
   );
+}
+
+/* Warm pink-gold glow rising from the horizon, slowly breathing */
+.sky__glow {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(120% 45% at 50% 100%, rgba(255, 143, 177, 0.28), transparent 70%),
+    radial-gradient(80% 30% at 20% 95%, rgba(247, 197, 49, 0.12), transparent 70%);
+  animation: glow-breathe 9s ease-in-out infinite alternate;
+}
+
+@keyframes glow-breathe {
+  from { opacity: 0.65; }
+  to   { opacity: 1; }
+}
+
+/* Stars — generated in JS, each with its own timing via CSS vars */
+.sky__stars,
+.sky__shooting {
+  position: absolute;
+  inset: 0;
+}
+
+.star {
+  position: absolute;
+  width: var(--size, 2px);
+  height: var(--size, 2px);
+  border-radius: 50%;
+  background: var(--star);
+  opacity: var(--min-o, 0.3);
+  animation: twinkle var(--dur, 3s) ease-in-out var(--delay, 0s) infinite alternate;
+  will-change: opacity, transform;
+}
+
+/* Bright stars get a soft glow + cross glint */
+.star--bright {
+  box-shadow: 0 0 6px 1px rgba(255, 248, 231, 0.8);
+}
+.star--bright::before,
+.star--bright::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  background: linear-gradient(90deg, transparent, rgba(255, 248, 231, 0.9), transparent);
+  transform: translate(-50%, -50%);
+}
+.star--bright::before { width: calc(var(--size) * 6); height: 1px; }
+.star--bright::after  { width: 1px; height: calc(var(--size) * 6);
+  background: linear-gradient(180deg, transparent, rgba(255, 248, 231, 0.9), transparent); }
+
+@keyframes twinkle {
+  0%   { opacity: var(--min-o, 0.3); transform: scale(0.8); }
+  100% { opacity: 1;                 transform: scale(1.15); }
+}
+
+/* Shooting star: a short glowing streak flying down-left */
+.shooting-star {
+  position: absolute;
+  width: clamp(80px, 28vw, 160px);
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, rgba(255, 248, 231, 0.95), transparent);
+  transform: rotate(var(--angle, 20deg));
+  transform-origin: left center;
+  opacity: 0;
+  animation: shoot var(--dur, 1.2s) ease-out forwards;
+}
+
+@keyframes shoot {
+  0%   { opacity: 0; translate: 0 0; }
+  15%  { opacity: 1; }
+  100% { opacity: 0; translate: calc(var(--dx) * 1px) calc(var(--dy) * 1px); }
+}
+
+/* Moon — top-left so it never collides with the controls (top-right) */
+.moon {
+  position: absolute;
+  top: calc(var(--safe-top) + 7vh);
+  left: calc(var(--safe-left) + 12vw);
+  width: clamp(54px, 16vw, 110px);
+  aspect-ratio: 1;
+}
+
+.moon__body {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 35% 35%, #fffaf0 0%, #fbeccb 55%, #e9d3a6 100%);
+  box-shadow:
+    inset -6px -4px 12px rgba(180, 150, 100, 0.35),
+    0 0 24px 6px var(--moon-glow);
+}
+
+.moon__halo {
+  position: absolute;
+  inset: -90%;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--moon-glow) 0%, transparent 65%);
+  animation: halo-pulse 6s ease-in-out infinite alternate;
+}
+
+@keyframes halo-pulse {
+  from { transform: scale(0.92); opacity: 0.7; }
+  to   { transform: scale(1.06); opacity: 1; }
+}
+
+/* Ground — bottom ~24% of the screen; flowers grow from here */
+.ground {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 26%;
+  min-height: 150px;
+  display: block;
+}
+
+/* Gentle fade-in of the whole sky on load */
+.sky-enter {
+  animation: sky-fade 2.2s ease-out both;
+}
+@keyframes sky-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
 /* ---------- Controls ---------- */
