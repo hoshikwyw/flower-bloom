@@ -212,6 +212,9 @@
       els.garden.replaceChildren(svg);
       this.svg = svg;
 
+      // Part 6: wind needs to know about the new plants
+      if (window.Ambient && window.Ambient.canvas) window.Ambient.setPlants(this.plants);
+
       // Set up the timelines (needs the SVG in the DOM to measure stems).
       // Without GSAP (offline), the garden simply shows fully bloomed.
       if (window.gsap && window.Growth && window.Bloom) {
@@ -269,8 +272,19 @@
     sky.init();
     garden.init();
 
+    // Part 6: wind + particles (skipped entirely for reduced motion)
+    const ambient = window.Ambient;
+    const motion = ambient && !state.reducedMotion;
+    if (motion) {
+      ambient.init(els.particles, garden.plants);
+      ambient.start();
+    }
+
     // Temporary auto-start; Part 7's "tap to open" intro will trigger this instead
-    setTimeout(() => garden.grow(), 1200);
+    setTimeout(async () => {
+      await garden.grow();
+      if (motion) ambient.startParticles();
+    }, 1200);
   }
 
   document.addEventListener("DOMContentLoaded", init);

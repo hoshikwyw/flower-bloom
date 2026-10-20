@@ -237,6 +237,9 @@
       transform: `translate(${x.toFixed(1)} ${y.toFixed(1)})`,
     }, parent);
 
+    // Wind rotates this group around the plant's base (Part 6)
+    const sway = el("g", { class: "plant__sway" }, root);
+
     // Gentle S-curve stem leaning slightly left or right
     const bend = (lean ? lean * rand(0.02, 0.07) : rand(-0.08, 0.08)) * height;
     const pts = [
@@ -254,10 +257,10 @@
       stroke: "#3d5a2a",
       "stroke-width": (3 * scale).toFixed(2),
       "stroke-linecap": "round",
-    }, root);
+    }, sway);
 
     // Opposite leaf pairs; the top pair is young (pink-red) growth
-    const leafGroup = el("g", { class: "plant__leaves" }, root);
+    const leafGroup = el("g", { class: "plant__leaves" }, sway);
     const leaves = [];
     const stops = [0.28, 0.48, 0.66, 0.84];
     stops.forEach((t, i) => {
@@ -285,7 +288,7 @@
       class: "plant__head",
       transform: `translate(${pts[3].x.toFixed(1)} ${pts[3].y.toFixed(1)}) ` +
                  `rotate(${rand(-12, 12).toFixed(1)}) scale(${headScale.toFixed(3)})`,
-    }, root);
+    }, sway);
 
     // Inner group scales around the stem tip (0,0) when the bud pops out
     const headInner = el("g", { class: "plant__head-inner" }, head);
@@ -295,7 +298,7 @@
     // Plants start as buds; Part 5 animates bud → flower
     if (flower) flower.root.setAttribute("opacity", 0);
 
-    return { root, stem, leaves, head, headInner, bud, flower, kind, depth, scale, height, x };
+    return { root, sway, stem, leaves, head, headInner, bud, flower, kind, depth, scale, height, x };
   }
 
   window.MesuaFlower = { NS, el, addDefs, createPlant, createFlower, createBud };
