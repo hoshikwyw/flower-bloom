@@ -238,6 +238,21 @@ body {
   display: block;
 }
 
+/* ---------- Garden (Part 3) ---------- */
+.garden {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  overflow: visible;
+}
+
+/* Back row sits further away: a little dimmer */
+.plant--back {
+  opacity: 0.78;
+}
+
 /* Gentle fade-in of the whole sky on load */
 .sky-enter {
   animation: sky-fade 2.2s ease-out both;
