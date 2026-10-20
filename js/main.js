@@ -133,8 +133,10 @@
   const garden = {
     svg: null,
     plants: [],
-    growth: null,     // GSAP timeline from Part 4
-    hasGrown: false,  // once grown, rebuilds (rotation) skip straight to the end
+    // GSAP timelines: growth (Part 4) → bloom (Part 5).
+    // Once a stage has played, rebuilds (rotation) jump straight to its end.
+    timelines: { growth: null, bloom: null },
+    played: { growth: false, bloom: false },
 
     // Same height as the .ground SVG in CSS (26%, min 150px)
     groundHeight() {
@@ -161,7 +163,7 @@
       // Back row: smaller, mix of buds and flowers
       for (let i = 0; i < backCount; i++) {
         plants.push({
-          x: w * (0.06 + (0.88 * i) / (backCount - 1)) + rand(-w * 0.03, w * 0.03),
+          x: w * (0.1 + (0.8 * i) / (backCount - 1)) + rand(-w * 0.02, w * 0.02),
           lean: i === 0 ? 1 : i === backCount - 1 ? -1 : 0,
           y: top - rand(4, 14),
           height: h * rand(0.2, 0.27),
@@ -210,25 +212,36 @@
       els.garden.replaceChildren(svg);
       this.svg = svg;
 
-      // Part 4: set up the growth timeline (needs the SVG in the DOM to measure stems)
-      if (window.gsap && window.Growth) {
-        if (this.growth) this.growth.kill();
-        this.growth = window.Growth.growGarden(this.plants, state);
-        if (this.hasGrown || state.reducedMotion) this.growth.progress(1);
+      // Set up the timelines (needs the SVG in the DOM to measure stems).
+      // Without GSAP (offline), the garden simply shows fully bloomed.
+      if (window.gsap && window.Growth && window.Bloom) {
+        Object.values(this.timelines).forEach((tl) => tl && tl.kill());
+        this.timelines.growth = window.Growth.growGarden(this.plants, state);
+        this.timelines.bloom = window.Bloom.bloomGarden(this.plants, state);
+
+        for (const name in this.timelines) {
+          if (this.played[name] || state.reducedMotion) this.timelines[name].progress(1);
+        }
+      } else {
+        this.plants.forEach((p) => p.flower && p.flower.root.setAttribute("opacity", 1));
       }
     },
 
-    // Plays the growth; resolves when every plant has its bud
-    grow() {
+    // Play one stage ("growth" | "bloom"); resolves when it finishes
+    play(name) {
       return new Promise((resolve) => {
-        if (!this.growth || this.hasGrown || this.growth.progress() === 1) {
-          this.hasGrown = true;
-          return resolve();
-        }
-        this.hasGrown = true;
-        this.growth.eventCallback("onComplete", resolve);
-        this.growth.play();
+        const tl = this.timelines[name];
+        const done = this.played[name] || !tl || tl.progress() === 1;
+        this.played[name] = true;
+        if (done) return resolve();
+        tl.eventCallback("onComplete", resolve);
+        tl.play();
       });
+    },
+
+    async grow() {
+      await this.play("growth");
+      await this.play("bloom");
     },
 
     init() {
