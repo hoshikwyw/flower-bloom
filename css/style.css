@@ -253,6 +253,256 @@ body {
   opacity: 0.78;
 }
 
+/* ---------- Intro envelope (Part 7) ---------- */
+.layer--intro {
+  display: grid;
+  place-items: center;
+  padding: calc(var(--safe-top) + var(--gutter)) var(--gutter) calc(var(--safe-bottom) + var(--gutter));
+  background: radial-gradient(circle at 50% 45%, rgba(58, 37, 88, 0.35), rgba(8, 6, 24, 0.72) 70%);
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
+  opacity: 0;
+  transition: opacity 1s ease;
+}
+.layer--intro.is-ready { opacity: 1; }
+.layer--intro.is-gone  { opacity: 0; pointer-events: none; }
+
+.intro__button {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 22px;
+  padding: 24px;
+  border: 0;
+  background: none;
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.intro__button:focus-visible {
+  outline: 2px dashed var(--love);
+  outline-offset: 6px;
+  border-radius: 16px;
+}
+
+/* Warm glow behind the envelope */
+.intro__button::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 34%;
+  width: 260px;
+  height: 260px;
+  translate: -50% -50%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 143, 177, 0.35), transparent 65%);
+  animation: halo-pulse 2.6s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+.envelope {
+  position: relative;
+  display: block;
+  width: 180px;
+  height: 120px;
+  perspective: 700px;
+  animation: float 3.2s ease-in-out infinite;
+}
+.layer--intro.is-opening .envelope { animation-play-state: paused; }
+
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  50%      { transform: translateY(-10px) rotate(2deg); }
+}
+
+.envelope > span { position: absolute; display: block; }
+
+.envelope__back {
+  inset: 0;
+  border-radius: 10px;
+  background: #e595ab;
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.35);
+}
+
+.envelope__letter {
+  left: 12px;
+  right: 12px;
+  bottom: 8px;
+  height: 104px;
+  z-index: 2;
+  border-radius: 6px;
+  background: linear-gradient(#fffdf7, #f6eedb);
+  display: grid !important;
+  place-items: start center;
+  padding-top: 6px;
+}
+.envelope__flower {
+  width: 64px;
+  height: 64px;
+  overflow: visible;
+}
+
+.envelope__front {
+  inset: 0;
+  z-index: 3;
+  border-radius: 10px;
+  background: linear-gradient(160deg, #f9cdd8, #f0aabd);
+  clip-path: polygon(0 0, 50% 58%, 100% 0, 100% 100%, 0 100%);
+}
+
+.envelope__flap {
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 62%;
+  z-index: 4;
+  background: linear-gradient(#f4b6c6, #ec9fb4);
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+  transform-origin: top center;
+  border-radius: 10px 10px 0 0;
+}
+
+.envelope__seal {
+  left: 50%;
+  top: 62%;
+  z-index: 5;
+  width: 34px;
+  height: 34px;
+  margin: -17px 0 0 -17px;
+  display: grid !important;
+  place-items: center;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #f06a8a, #b8304f);
+  color: #fff;
+  font-size: 16px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+.intro__to {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  text-shadow: 0 0 18px rgba(255, 143, 177, 0.6);
+}
+.intro__name {
+  font-family: var(--font-script);
+  font-size: var(--fs-xl);
+  font-weight: 700;
+  line-height: 1;
+}
+.intro__to .my { font-size: var(--fs-lg); line-height: 1.4; }
+
+.intro__hint {
+  font-size: var(--fs-sm);
+  color: var(--text-soft);
+  animation: hint-pulse 1.8s ease-in-out infinite;
+}
+@keyframes hint-pulse {
+  0%, 100% { opacity: 0.45; }
+  50%      { opacity: 1; }
+}
+
+/* ---------- Love message (Part 7) ---------- */
+.layer--message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding:
+    calc(var(--safe-top) + 11vh)
+    calc(var(--safe-right) + var(--gutter))
+    0
+    calc(var(--safe-left) + var(--gutter));
+  text-align: center;
+  visibility: hidden;
+}
+.layer--message.is-active { visibility: visible; }
+
+.message__name {
+  font-family: var(--font-script);
+  font-size: var(--fs-xl);
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--text);
+  text-shadow: 0 0 22px rgba(255, 143, 177, 0.75), 0 0 4px rgba(255, 246, 236, 0.5);
+}
+
+.message__char {
+  display: inline-block;
+  opacity: 0;
+  filter: blur(6px);
+  transform: translateY(14px) scale(0.8);
+  transition: opacity 0.8s ease, filter 0.8s ease, transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.message__name.is-visible .message__char {
+  opacity: 1;
+  filter: blur(0);
+  transform: none;
+}
+.message__heart {
+  color: var(--love);
+  font-family: var(--font-body);
+  font-size: 0.6em;
+  vertical-align: middle;
+}
+.message__name.is-visible .message__heart {
+  animation: heartbeat 1.6s ease-in-out 2s infinite;
+}
+@keyframes heartbeat {
+  0%, 100% { transform: scale(1); }
+  15%      { transform: scale(1.25); }
+  30%      { transform: scale(1); }
+  45%      { transform: scale(1.18); }
+}
+
+/* Two lines per page; fixed min-height so the layout never jumps */
+.message__page {
+  width: 100%;
+  max-width: 34rem;
+  min-height: calc(2 * 1.9em + 1rem);
+  margin-top: 2.2vh;
+  font-size: clamp(1.05rem, 4.8vw, 1.5rem);
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.6s ease, transform 0.6s ease, filter 0.6s ease;
+}
+.message__page.is-visible { opacity: 1; transform: none; }
+.message__page.is-leaving { opacity: 0; transform: translateY(-10px); filter: blur(4px); }
+
+.message__line {
+  line-height: 1.9;
+  color: var(--text);
+  text-shadow: 0 0 12px rgba(11, 10, 31, 0.9), 0 0 18px rgba(255, 143, 177, 0.35);
+}
+.message__rest {
+  color: transparent;
+  text-shadow: none;
+}
+
+/* Blinking caret while typing */
+.message__caret {
+  display: none;
+  width: 2px;
+  height: 1.05em;
+  margin-right: -2px;
+  vertical-align: -0.15em;
+  background: var(--stamen);
+  border-radius: 1px;
+  animation: caret 0.9s steps(1) infinite;
+}
+.message__line.is-typing .message__caret { display: inline-block; }
+@keyframes caret { 50% { opacity: 0; } }
+
+/* Final page glows softly forever */
+.message__page.is-final .message__line:last-child {
+  animation: love-glow 2.4s ease-in-out infinite alternate;
+}
+@keyframes love-glow {
+  from { text-shadow: 0 0 12px rgba(11, 10, 31, 0.9), 0 0 10px rgba(255, 143, 177, 0.3); }
+  to   { text-shadow: 0 0 12px rgba(11, 10, 31, 0.9), 0 0 26px rgba(255, 143, 177, 0.9); }
+}
+
 /* Gentle fade-in of the whole sky on load */
 .sky-enter {
   animation: sky-fade 2.2s ease-out both;

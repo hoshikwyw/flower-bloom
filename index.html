@@ -59,11 +59,28 @@
     <!-- Layer 3: fireflies, pollen, falling petals (Part 6) -->
     <canvas id="particles" class="layer layer--particles" aria-hidden="true"></canvas>
 
-    <!-- Layer 4: love message (Part 7) -->
-    <section id="message" class="layer layer--message" aria-live="polite"></section>
+    <!-- Layer 4: love message (Part 7) — filled in by js/message.js -->
+    <section id="message" class="layer layer--message" lang="my"></section>
 
-    <!-- Layer 5: intro "tap to open" screen (Part 7) -->
-    <section id="intro" class="layer layer--intro"></section>
+    <!-- Layer 5: intro "tap to open" envelope (Part 7) -->
+    <section id="intro" class="layer layer--intro">
+      <button class="intro__button" type="button" aria-label="Open your surprise">
+        <span class="envelope" aria-hidden="true">
+          <span class="envelope__back"></span>
+          <span class="envelope__letter">
+            <svg class="envelope__flower" viewBox="-80 -80 160 160"></svg>
+          </span>
+          <span class="envelope__front"></span>
+          <span class="envelope__flap"></span>
+          <span class="envelope__seal">♥</span>
+        </span>
+        <span class="intro__to">
+          <span class="intro__name">Mama</span>
+          <span class="my" lang="my">အတွက်</span>
+        </span>
+        <span class="intro__hint my" lang="my">နှိပ်ပြီး ဖွင့်ကြည့်ပါ</span>
+      </button>
+    </section>
 
     <!-- Controls: music toggle (Part 8) -->
     <div id="controls" class="controls"></div>
@@ -75,6 +92,7 @@
   <script src="js/growth.js"></script>
   <script src="js/bloom.js"></script>
   <script src="js/ambient.js"></script>
+  <script src="js/message.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>

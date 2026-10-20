@@ -94,6 +94,7 @@
       s.style.setProperty("--dur", `${rand(0.9, 1.5)}s`);
 
       s.addEventListener("animationend", () => s.remove(), { once: true });
+      setTimeout(() => s.remove(), 3000); // safety net if animationend never fires
       this.shootingEl.appendChild(s);
     },
 
@@ -280,11 +281,17 @@
       ambient.start();
     }
 
-    // Temporary auto-start; Part 7's "tap to open" intro will trigger this instead
-    setTimeout(async () => {
-      await garden.grow();
-      if (motion) ambient.startParticles();
-    }, 1200);
+    // Part 7: the envelope starts everything
+    //   tap → envelope opens → plants grow → name + message appear while flowers bloom
+    window.Message.build(els.message, state.reducedMotion);
+    window.Intro.init(els.intro, {
+      onOpened: async () => {
+        await garden.play("growth");
+        window.Message.play();
+        await garden.play("bloom");
+        if (motion) ambient.startParticles();
+      },
+    });
   }
 
   document.addEventListener("DOMContentLoaded", init);
